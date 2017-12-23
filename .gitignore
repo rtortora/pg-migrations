@@ -1,0 +1,4 @@
+node_modules/*
+migrations/*
+migrations.config.js
+yarn-error.log
