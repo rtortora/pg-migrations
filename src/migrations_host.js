@@ -53,7 +53,9 @@ export default class MigrationsHost {
         throw new Error(`${config.configPath} does not define a getConnection method`);
       }
       this._conn = await config.getConnection();
-      await this._conn.connect();
+      if (!this._conn._connecting && !this._conn._connected) {
+        await this._conn.connect();
+      }
     }
     if (bootstrap && !this._bootstrapped) {
       const config = await this.config();
