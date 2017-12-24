@@ -25,12 +25,12 @@ function _doInit() {
 
     if (!(yield _asyncFile.default.exists(path))) {
       yield _asyncFile.default.writeFile(path, `export default {
-migrationsTableName: "migrations",
-migrationsPath: "./migrations/",
-getConnection: async ()=>{
-  const pg = /* do stuff to get a single pg client to your database */
-  return pg;
-}
+  migrationsTableName: "migrations",
+  migrationsPath: "./migrations/",
+  getConnection: async ()=>{
+    const pg = /* do stuff to get a single pg client to your database */
+    return pg;
+  }
 }
   `);
       console.log(`Wrote skeleton to ${path}`);

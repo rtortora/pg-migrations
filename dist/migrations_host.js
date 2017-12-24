@@ -89,7 +89,10 @@ class MigrationsHost {
         }
 
         _this2._conn = yield config.getConnection();
-        yield _this2._conn.connect();
+
+        if (!_this2._conn._connecting && !_this2._conn._connected) {
+          yield _this2._conn.connect();
+        }
       }
 
       if (bootstrap && !_this2._bootstrapped) {
