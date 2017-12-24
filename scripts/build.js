@@ -14,7 +14,7 @@ const args = minimist(process.argv.slice(2));
       await execa.shell(`git checkout master && git pull`, { stdio:[0,1,2] });
     }
 
-    await execa.shell(`env NODE_ENV=development node_modules/.bin/babel --source-maps -d dist/ src/`, { stdio:[0,1,2] });
+    await execa.shell(`env NODE_ENV=development node_modules/.bin/babel --source-maps --copy-files -d dist/ src/`, { stdio:[0,1,2] });
 
     const pkg = JSON.parse(await FS.readFile(Path.join(__dirname, "../package.json")));
     const version = map(pkg.version.split("."), (x)=>parseInt(x));
