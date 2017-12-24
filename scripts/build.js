@@ -11,7 +11,7 @@ const args = minimist(process.argv.slice(2));
 (async()=>{
   try {
     if (args.stable) {
-      await execa.shell(`git pull`, { stdio:[0,1,2] });
+      await execa.shell(`git checkout master && git pull`, { stdio:[0,1,2] });
     }
 
     await execa.shell(`env NODE_ENV=development node_modules/.bin/babel --source-maps -d dist/ src/`, { stdio:[0,1,2] });
@@ -30,7 +30,7 @@ const args = minimist(process.argv.slice(2));
     await FS.writeFile(Path.join(__dirname, "../package.json"), JSON.stringify(pkg, null, 2));
 
     if (args.stable) {
-      await execa.shell(`git add --all && git commit -m 'bump to ${nextVersion.join(',')}' && git push`, { stdio:[0,1,2] });
+      await execa.shell(`git add --all && git commit -m 'bump to ${nextVersion.join(',')}' && git push && git checkout stable && git merge master && git push && git checkout master`, { stdio:[0,1,2] });
     }
 
     process.exit(0);

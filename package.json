@@ -1,5 +1,15 @@
 {
-  "version": "0.2",
+  "name": "pg-migrations",
+  "version": "0.3",
+  "main": "dist/migrations_host.js",
+  "license": "MIT",
+  "author": {
+    "name": "Richard Tortora",
+    "email": "richard.tortora@gmail.com"
+  },
+  "bin": {
+    "pg-migrations": "./dist/cli.js"
+  },
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.35",
     "@babel/preset-env": "^7.0.0-beta.35",
