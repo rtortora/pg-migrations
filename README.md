@@ -4,6 +4,10 @@ Are you using node-postgres and find [node-pg-migrate](https://github.com/salsit
 
 Nota Bene: You should probably just use [node-pg-migrate](https://github.com/salsita/node-pg-migrate) instead.
 
+All migrations are run in a transaction. If any fail, it rolls the transaction back, and stops what it's doing.
+
+pg-migrations uses advisory locks to ensure that multiple instances of your app won't run the same migrations at the same time (for multi-server deployments). That being said, it's not super tested.
+
 ## Installation
 
 For these installation steps, I'm assuming you're using yarn and ES2015+ with async/await and import/export.
@@ -16,7 +20,7 @@ Then add this to the commands in your `package.json`:
 
 ```json
 {
-  commands: {
+  "scripts": {
     "migrate": "node_modules/.bin/pg-migrations"
   }
 }
@@ -64,11 +68,11 @@ To see the status of all migrations, run:
 
    yarn migrate status
 
-To run all outstanding migrations, run:
+To run all outstanding migrations in order of the datetime field in the filename, run:
 
     yarn migrate up
 
-To undo the most recent migration, run:
+To undo the most recent migration as determined by the time of migration (not the datetime field in the filename), run:
 
     yarn migrate down
 
@@ -78,10 +82,3 @@ To run a specific migration up or down, run:
 
 For any up/down, you can --dryrun to see what files it will run first.
 
-## Transactional Safety
-
-All migrations are run in a transaction. If any fail, it rolls the transaction back, and stops what it's doing.
-
-## Concurrency
-
-pg-migrations uses advisory locks to ensure that multiple instances of your app won't run the same migrations at the same time (for multi-server deployments). That being said, it's not super tested.
