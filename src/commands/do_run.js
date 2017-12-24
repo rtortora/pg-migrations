@@ -2,12 +2,12 @@ import sortBy from 'lodash.sortby';
 import filter from 'lodash.filter';
 import isFunction from 'lodash.isfunction';
 
-export default async function doRun(project, migration, direction, args) {
+export default async function doRun(host, migration, direction, args) {
   if (direction != "up" && direction != "down") {
     throw new Error(`Unhandled migration direction, must be 'up' or 'down' but was: '${direction}'`);
   }
-  await project.withMigrationLock(async ()=>{
-    const migrationStatusMap = await project.migrationStatusMap({ refresh: true });
+  await host.withMigrationLock(async ()=>{
+    const migrationStatusMap = await host.migrationStatusMap({ refresh: true });
 
     // Determine which migrations to run
     let migrations;
@@ -53,19 +53,19 @@ export default async function doRun(project, migration, direction, args) {
     }
 
     // Actually run the migrations
-    const conn = await project.conn();
+    const conn = await host.conn();
     for (let migration of migrations) {
       const module = require(migration.path).default;
       if (isFunction(module[direction])) {
         console.log(`.... ${direction} ${migration.key} ${migration.path}`);
-        await project.withTransaction(async()=>{
+        await host.withTransaction(async()=>{
           await (module[direction].bind(module, conn)());
-          await project.setMigrationStatus(migration, direction);
+          await host.setMigrationStatus(migration, direction);
           console.log(`OKAY ${direction} ${migration.key} ${migration.path}`);
         });
       } else {
-        await project.withTransaction(async()=>{
-          await project.setMigrationStatus(migration, direction);
+        await host.withTransaction(async()=>{
+          await host.setMigrationStatus(migration, direction);
           console.log(`SKIP ${direction} ${migration.key} ${migration.path} (no such direction ${direction})`);
         });
       }

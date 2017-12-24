@@ -1,8 +1,8 @@
 import Path from 'path';
 import FS from 'async-file';
 
-export default async function doCreate(project, args) {
-  const config = await project.config();
+export default async function doCreate(migrationController, args) {
+  const config = await migrationController.config();
   const key = (new Date()).toISOString().replace(/:\d\d\..*/, '').replace(/[-T:]/g, '');
   const filename = `${key}.js`;
   const path = Path.join(config.migrationsPath, filename);

@@ -1,9 +1,9 @@
 import FS from 'async-file';
 import Path from 'path';
-import { CONFIG_FILENAME } from '../lib/project';
+import { CONFIG_FILENAME } from '../migrations_host';
 
-export default async function doInit(project) {
-  const path = Path.join(project.rootPath, CONFIG_FILENAME);
+export default async function doInit(host) {
+  const path = Path.join(host.rootPath, CONFIG_FILENAME);
   if (!(await FS.exists(path))) {
     await FS.writeFile(path, `export default {
 migrationsTableName: "migrations",

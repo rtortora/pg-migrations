@@ -1,5 +1,5 @@
 import minimist from 'minimist';
-import Project from './lib/project';
+import MigrationsHost from './migrations_host';
 import doCreate from './commands/do_create';
 import doInit from './commands/do_init';
 import doRun from './commands/do_run';
@@ -11,23 +11,23 @@ const args = minimist(process.argv.slice(2));
 
 (async ()=>{
   try {
-    const project = new Project(args.config || process.cwd());
+    const host = new MigrationsHost(args.config || process.cwd());
     const command = args._.shift().toString();
 
     if (command == 'init') {
-      await doInit(project);
+      await doInit(host);
     } else if (command == 'create') {
-      await doCreate(project, args);
+      await doCreate(host, args);
     } else if (command == 'status') {
-      await doStatus(project, args);
+      await doStatus(host, args);
     } else if (command == 'up') {
-      await doRun(project, null, 'up', args);
+      await doRun(host, null, 'up', args);
     } else if (command == 'down') {
-      await doRun(project, null, 'down', args);
+      await doRun(host, null, 'down', args);
     } else {
-      const localMigrationsMap = await project.localMigrationsMap();
+      const localMigrationsMap = await host.localMigrationsMap();
       if (localMigrationsMap.has(command)) {
-        await doRun(project, localMigrationsMap.get(command), args._.shift(), args);
+        await doRun(host, localMigrationsMap.get(command), args._.shift(), args);
       } else {
         console.log(`Can't find migration by key '${command}'`);
         process.exit(1);
