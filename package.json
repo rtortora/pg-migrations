@@ -1,6 +1,6 @@
 {
   "name": "pg-migrations",
-  "version": "0.3",
+  "version": "0.4",
   "main": "dist/migrations_host.js",
   "license": "MIT",
   "author": {
