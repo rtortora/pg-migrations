@@ -4,7 +4,6 @@ import map from 'lodash.map';
 import forEach from 'lodash.foreach';
 import isFunction from 'lodash.isfunction';
 import merge from 'lodash.merge';
-import filenameToKey from './filename_to_key';
 
 export const CONFIG_FILENAME = "migrations.config.js";
 
@@ -81,12 +80,15 @@ export default class MigrationsHost {
       const files = await FS.readdir(config.migrationsPath);
       this._localMigrationsMap = new Map();
       forEach(files, (filename)=>{
-        const key = filenameToKey(filename);
-        this._localMigrationsMap.set(key, {
-          key,
-          filename,
-          path: Path.join(config.migrationsPath, filename),
-        });
+        const keySearch = filename.match(/([0-9]{12,14})/);
+        if (keySearch) {
+          const key = keySearch[1];
+          this._localMigrationsMap.set(key, {
+            key,
+            filename,
+            path: Path.join(config.migrationsPath, filename),
+          });
+        }
       });
     }
     return this._localMigrationsMap;

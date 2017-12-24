@@ -1,11 +1,10 @@
+#!/usr/bin/env node --require babel-register --require babel-polyfill
 import minimist from 'minimist';
-import MigrationsHost from './migrations_host';
+import MigrationsHost from './migrations_host.js';
 import doCreate from './commands/do_create';
 import doInit from './commands/do_init';
 import doRun from './commands/do_run';
 import doStatus from './commands/do_status';
-
-import find from 'lodash.find';
 
 const args = minimist(process.argv.slice(2));
 
