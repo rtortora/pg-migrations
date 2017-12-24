@@ -1,26 +1,22 @@
-import Path from 'path';
-import FS from 'async-file';
 import Table from 'cli-table';
-import map from 'lodash.map';
-import forEach from 'lodash.foreach';
-import log from '../lib/logger';
-import bootstrap from '../lib/bootstrap';
-import discoverMigrationsStatus from '../lib/discover_migrations_status';
+import sortBy from 'lodash.sortby';
 
-export default async function doStatus({ config, migrations, args }) {
-  const conn = await config.getConnection();
-  await conn.connect();
-  await bootstrap(config, conn);
-  const statuses = await discoverMigrationsStatus(config, migrations, conn);
+export default async function doStatus(project, args) {
+  const migrationStatusMap = await project.migrationStatusMap();
+  const sortedKeys = sortBy(Array.from(migrationStatusMap.keys()), [
+    (key)=>{ return migrationStatusMap.get(key).applied ? 0 : 1 },
+    (key)=>{ return migrationStatusMap.get(key).applied ? migrationStatusMap.get(key).applied.migrated_at : key },
+  ]);
   const table = new Table({
     head: [ "Key", "Status", "Path" ],
   });
-  forEach(statuses, (status)=>{
+  for(let key of sortedKeys) {
+    const status = migrationStatusMap.get(key);
     table.push([
-      status.key,
-      status.up ? `up at ${status.up.migrated_at}` : `down`,
+      key,
+      status.applied ? `up at ${status.applied.migrated_at}` : `down`,
       status.local ? status.local.filename : `*** NO FILE ***`,
     ]);
-  });
+  }
   console.log(table.toString());
 }

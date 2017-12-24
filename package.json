@@ -10,6 +10,7 @@
     "lodash.isfunction": "^3.0.8",
     "lodash.map": "^4.6.0",
     "lodash.merge": "^4.6.0",
+    "lodash.sortby": "^4.7.0",
     "minimist": "^1.2.0"
   },
   "dependencies": {

@@ -2,6 +2,7 @@ import minimist from 'minimist';
 import find from 'lodash.find';
 import log from './lib/logger';
 import loadConfig from './lib/load_config';
+import Project from './lib/project';
 import discoverMigrations from './lib/discover_migrations';
 import doCreate from './commands/do_create';
 import doInit from './commands/do_init';
@@ -12,24 +13,24 @@ const args = minimist(process.argv.slice(2));
 
 (async ()=>{
   try {
+    const project = new Project(args.config || process.cwd());
     const command = args._.shift();
+
     if (command == 'init') {
-      await doInit({ args });
+      await doInit(project);
     } else {
-      const config = await loadConfig(args.config || process.cwd());
-      const migrations = await discoverMigrations(config);
       if (command == 'create') {
-        await doCreate({ config, migrations, args });
+        await doCreate(project, args);
       } else if (command == 'status') {
-        await doStatus({ config, migrations, args });
+        await doStatus(project, args);
       } else if (command == 'up') {
-        await doRun({ config, migrations, args, direction: 'up' });
+        await doRun(project, null, 'up', args);
       } else if (command == 'down') {
-        await doRun({ config, migrations, args, direction: 'down' });
+        await doRun(project, null, 'down', args);
       } else {
-        const migration = find(migrations, (migration)=>{ return migration.key == command; });
-        if (migration) {
-          await doRun({ config, migration, direction: args._.shift(), args });
+        const localMigrationsMap = await project.localMigrationsMap();
+        if (localMigrationsMap.has(command)) {
+          await doRun(project, localMigrationsMap.get(command), args._.shift(), args);
         }
       }
     }
