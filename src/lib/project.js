@@ -35,7 +35,7 @@ export default class Project {
     return this._config;
   }
 
-  async getConnection({ bootstrap = false } = {}) {
+  async conn({ bootstrap = false } = {}) {
     if (!this._conn) {
       const config = await this.config();
       if (!isFunction(config.getConnection)) {
@@ -84,7 +84,7 @@ export default class Project {
       }
 
       const config = await this.config();
-      const conn = await this.getConnection({ bootstrap: true });
+      const conn = await this.conn({ bootstrap: true });
       const statuses = (await conn.query(`select "key", "filename", "migrated_at" from "${config.migrationsTableName}" order by "migrated_at"`)).rows;
       forEach(statuses, (status)=>{
         this._migrationStatusMap.set(status.key, {
@@ -101,7 +101,7 @@ export default class Project {
       throw new Error(`Unhandled status, must be 'up' or 'down' but was: '${status}'`);
     }
     const config = await this.config();
-    const conn = await this.getConnection();
+    const conn = await this.conn({ bootstrap: true });
     const migrationStatusMap = await this.migrationStatusMap();
     if (status == 'up' && !migrationStatusMap.get(migration.key).applied) {
       await conn.query(`insert into "${config.migrationsTableName}" (key, filename) values ($1, $2)`, [
@@ -120,7 +120,7 @@ export default class Project {
       await fn();
     } else {
       const config = await this.config();
-      const conn = await this.getConnection();
+      const conn = await this.conn({ bootstrap: true });
       this._withMigrationLock = true;
       await conn.query(`select pg_advisory_lock(1) from "${config.migrationsTableName}"`);
       try {
@@ -137,7 +137,7 @@ export default class Project {
       await fn();
     } else {
       const config = await this.config();
-      const conn = await this.getConnection();
+      const conn = await this.conn();
       this._withTransaction = true;
       await conn.query(`begin`);
       try {

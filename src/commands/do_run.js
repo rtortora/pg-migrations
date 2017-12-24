@@ -53,7 +53,7 @@ export default async function doRun(project, migration, direction, args) {
     }
 
     // Actually run the migrations
-    const conn = await project.getConnection();
+    const conn = await project.conn();
     for (let migration of migrations) {
       const module = require(migration.path).default;
       if (isFunction(module[direction])) {
