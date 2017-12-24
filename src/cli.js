@@ -5,6 +5,7 @@ import loadConfig from './lib/load_config';
 import discoverMigrations from './lib/discover_migrations';
 import doCreate from './commands/do_create';
 import doInit from './commands/do_init';
+import doRun from './commands/do_run';
 import doStatus from './commands/do_status';
 
 const args = minimist(process.argv.slice(2));
@@ -22,9 +23,14 @@ const args = minimist(process.argv.slice(2));
       } else if (command == 'status') {
         await doStatus({ config, migrations, args });
       } else if (command == 'up') {
+        await doRun({ config, migrations, args, direction: 'up' });
       } else if (command == 'down') {
+        await doRun({ config, migrations, args, direction: 'down' });
       } else {
         const migration = find(migrations, (migration)=>{ return migration.key == command; });
+        if (migration) {
+          await doRun({ config, migration, direction: args._.shift(), args });
+        }
       }
     }
     process.exit(0);
