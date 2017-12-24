@@ -1,8 +1,8 @@
 # pg-migrations
 
-Are you using node-postgres and find [https://github.com/salsita/node-pg-migrate](node-pg-migrate) too much of a whole thing? Then maybe this is for you!
+Are you using node-postgres and find [node-pg-migrate](https://github.com/salsita/node-pg-migrate) too much of a whole thing? Then maybe this is for you!
 
-Nota Bene: You should probably just use [https://github.com/salsita/node-pg-migrate](node-pg-migrate) instead.
+Nota Bene: You should probably just use [node-pg-migrate](https://github.com/salsita/node-pg-migrate) instead.
 
 ## Installation
 
