@@ -6,7 +6,7 @@
 export default function filenameToKey(filename) {
   const match = filename.match(/([0-9]{12,14})/);
   if (match) {
-    return match[1];
+    return match[1].toString();
   } else {
     return null;
   }

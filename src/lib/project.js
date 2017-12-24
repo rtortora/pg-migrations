@@ -6,7 +6,7 @@ import isFunction from 'lodash.isfunction';
 import merge from 'lodash.merge';
 import filenameToKey from './filename_to_key';
 
-const CONFIG_FILENAME = "migrations.config.js";
+export const CONFIG_FILENAME = "migrations.config.js";
 
 export default class Project {
   constructor(rootPath = null) {
@@ -58,8 +58,8 @@ export default class Project {
     return this._conn;
   }
 
-  async localMigrationsMap() {
-    if (!this._localMigrationsMap) {
+  async localMigrationsMap({ refresh = false } = {}) {
+    if (!this._localMigrationsMap || refresh) {
       const config = await this.config();
       const files = await FS.readdir(config.migrationsPath);
       this._localMigrationsMap = new Map();
@@ -75,8 +75,8 @@ export default class Project {
     return this._localMigrationsMap;
   }
 
-  async migrationStatusMap() {
-    if (!this._migrationStatusMap) {
+  async migrationStatusMap({ refresh = false } = {}) {
+    if (!this._migrationStatusMap || refresh) {
       const localMigrationsMap = await this.localMigrationsMap();
       this._migrationStatusMap = new Map();
       for(let [key, migration] of localMigrationsMap) {
@@ -85,15 +85,34 @@ export default class Project {
 
       const config = await this.config();
       const conn = await this.getConnection({ bootstrap: true });
-      const status = (await conn.query(`select "key", "filename", "migrated_at" from "${config.migrationsTableName}" order by "migrated_at"`)).rows;
-      forEach(status, (status)=>{
+      const statuses = (await conn.query(`select "key", "filename", "migrated_at" from "${config.migrationsTableName}" order by "migrated_at"`)).rows;
+      forEach(statuses, (status)=>{
         this._migrationStatusMap.set(status.key, {
           applied: status,
-          local: localMigrationsMap.get(key),
+          local: localMigrationsMap.get(status.key),
         });
       });
     }
     return this._migrationStatusMap;
+  }
+
+  async setMigrationStatus(migration, status) {
+    if (status != 'up' && status != 'down') {
+      throw new Error(`Unhandled status, must be 'up' or 'down' but was: '${status}'`);
+    }
+    const config = await this.config();
+    const conn = await this.getConnection();
+    const migrationStatusMap = await this.migrationStatusMap();
+    if (status == 'up' && !migrationStatusMap.get(migration.key).applied) {
+      await conn.query(`insert into "${config.migrationsTableName}" (key, filename) values ($1, $2)`, [
+        migration.key,
+        Path.basename(migration.path, ".js"),
+      ]);
+    } else if (status == 'down' && migrationStatusMap.get(migration.key).applied) {
+      await conn.query(`delete from "${config.migrationsTableName}" where key = $1`, [
+        migration.key,
+      ]);
+    }
   }
 
   async withMigrationLock(fn) {
@@ -109,6 +128,26 @@ export default class Project {
       } finally {
         await conn.query(`select pg_advisory_unlock(1) from "${config.migrationsTableName}"`);
         this._withMigrationLock = false;
+      }
+    }
+  }
+
+  async withTransaction(fn) {
+    if (this._withTransaction) {
+      await fn();
+    } else {
+      const config = await this.config();
+      const conn = await this.getConnection();
+      this._withTransaction = true;
+      await conn.query(`begin`);
+      try {
+        await fn();
+        await conn.query("commit");
+      } catch(exception) {
+        await conn.query("rollback");
+        throw exception;
+      } finally {
+        this._withTransaction = false;
       }
     }
   }
