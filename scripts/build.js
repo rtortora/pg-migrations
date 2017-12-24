@@ -21,16 +21,16 @@ const args = minimist(process.argv.slice(2));
 
     let nextVersion;
     if (args.major) {
-      nextVersion = [version[0] + 1, version[1]];
+      nextVersion = [version[0] + 1, version[1]].join('.');
     } else {
-      nextVersion = [version[0], version[1] + 1];
+      nextVersion = [version[0], version[1] + 1].join('.');
     }
 
-    pkg.version = nextVersion.join(".");
+    pkg.version = nextVersion;
     await FS.writeFile(Path.join(__dirname, "../package.json"), JSON.stringify(pkg, null, 2));
 
     if (args.stable) {
-      await execa.shell(`git add --all && git commit -m 'bump to ${nextVersion.join(',')}' && git push && git checkout stable && git merge master && git push && git checkout master`, { stdio:[0,1,2] });
+      await execa.shell(`git add --all && git commit -m 'bump to ${nextVersion}' && git push && git checkout stable && git merge master && git push && git tag -a v${nextVersion} -m 'v${nextVersion}' && git push origin v${nextVersion} && git checkout master`, { stdio:[0,1,2] });
     }
 
     process.exit(0);
