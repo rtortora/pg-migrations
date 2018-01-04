@@ -23,7 +23,7 @@ _asyncToGenerator(function* () {
   try {
     const host = new _migrations_host.default(args.config || process.cwd());
 
-    const command = args._.shift().toString();
+    const command = args._.shift();
 
     if (command == 'init') {
       yield (0, _do_init.default)(host);

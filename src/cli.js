@@ -11,7 +11,7 @@ const args = minimist(process.argv.slice(2));
 (async ()=>{
   try {
     const host = new MigrationsHost(args.config || process.cwd());
-    const command = args._.shift().toString();
+    const command = args._.shift();
 
     if (command == 'init') {
       await doInit(host);
