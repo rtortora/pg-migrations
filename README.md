@@ -21,7 +21,7 @@ Then add this to the commands in your `package.json`:
 ```json
 {
   "scripts": {
-    "migrate": "node_modules/.bin/pg-migrations"
+    "migrate": "node --require babel-register --require babel-polyfill node_modules/.bin/pg-migrations"
   }
 }
 ```
