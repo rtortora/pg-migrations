@@ -21,9 +21,11 @@ const args = minimist(process.argv.slice(2));
 
     let nextVersion;
     if (args.major) {
-      nextVersion = [version[0] + 1, version[1]].join('.');
+      nextVersion = [version[0] + 1, version[1], version[2]].join('.');
+    } else if (args.patch) {
+      nextVersion = [version[0], version[1], version[2] + 1].join('.');
     } else {
-      nextVersion = [version[0], version[1] + 1].join('.');
+      nextVersion = [version[0], version[1] + 1, 0].join('.');
     }
 
     pkg.version = nextVersion;
