@@ -1,10 +1,9 @@
-#!/usr/bin/env node --require babel-register --require babel-polyfill
+#!/usr/bin/env node
 
-import minimist from 'minimist';
-import execa from 'execa';
-import FS from 'async-file';
-import Path from 'path';
-import map from 'lodash.map';
+const minimist = require('minimist');
+const execa = require('execa');
+const FS = require('async-file');
+const Path = require('path');
 
 const args = minimist(process.argv.slice(2));
 
@@ -17,7 +16,7 @@ const args = minimist(process.argv.slice(2));
     await execa.shell(`env NODE_ENV=development node_modules/.bin/babel --source-maps --copy-files -d dist/ src/`, { stdio:[0,1,2] });
 
     const pkg = JSON.parse(await FS.readFile(Path.join(__dirname, "../package.json")));
-    const version = map(pkg.version.split("."), (x)=>parseInt(x));
+    const version = pkg.version.split(".").map((x)=>parseInt(x));
 
     let nextVersion;
     if (args.major) {

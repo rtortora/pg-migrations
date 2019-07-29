@@ -1,45 +1,41 @@
-#!/usr/bin/env node --require babel-register --require babel-polyfill
-"use strict";
-
-var _minimist = _interopRequireDefault(require("minimist"));
-
-var _migrations_host = _interopRequireDefault(require("./migrations_host.js"));
-
-var _do_create = _interopRequireDefault(require("./commands/do_create"));
-
-var _do_init = _interopRequireDefault(require("./commands/do_init"));
-
-var _do_run = _interopRequireDefault(require("./commands/do_run"));
-
-var _do_status = _interopRequireDefault(require("./commands/do_status"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
+#!/usr/bin/env node
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } } function _next(value) { step("next", value); } function _throw(err) { step("throw", err); } _next(); }); }; }
 
-const args = (0, _minimist.default)(process.argv.slice(2));
+const minimist = require('minimist');
+
+const MigrationsHost = require('./migrations_host.js');
+
+const doCreate = require('./commands/do_create');
+
+const doInit = require('./commands/do_init');
+
+const doRun = require('./commands/do_run');
+
+const doStatus = require('./commands/do_status');
+
+const args = minimist(process.argv.slice(2));
 
 _asyncToGenerator(function* () {
   try {
-    const host = new _migrations_host.default(args.config || process.cwd());
+    const host = new MigrationsHost(args.config || process.cwd());
 
     const command = args._.shift();
 
     if (command == 'init') {
-      yield (0, _do_init.default)(host);
+      yield doInit(host);
     } else if (command == 'create') {
-      yield (0, _do_create.default)(host, args);
+      yield doCreate(host, args);
     } else if (command == 'status') {
-      yield (0, _do_status.default)(host, args);
+      yield doStatus(host, args);
     } else if (command == 'up') {
-      yield (0, _do_run.default)(host, null, 'up', args);
+      yield doRun(host, null, 'up', args);
     } else if (command == 'down') {
-      yield (0, _do_run.default)(host, null, 'down', args);
+      yield doRun(host, null, 'down', args);
     } else {
       const localMigrationsMap = yield host.localMigrationsMap();
 
       if (localMigrationsMap.has(command)) {
-        yield (0, _do_run.default)(host, localMigrationsMap.get(command), args._.shift(), args);
+        yield doRun(host, localMigrationsMap.get(command), args._.shift(), args);
       } else {
         console.log(`Can't find migration by key '${command}'`);
         process.exit(1);

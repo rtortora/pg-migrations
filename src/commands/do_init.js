@@ -1,11 +1,11 @@
-import FS from 'async-file';
-import Path from 'path';
-import { CONFIG_FILENAME } from '../migrations_host';
+const FS = require('async-file');
+const Path = require('path');
+const { CONFIG_FILENAME } = require('../migrations_host');
 
-export default async function doInit(host) {
+module.exports = async function doInit(host) {
   const path = Path.join(host.rootPath, CONFIG_FILENAME);
   if (!(await FS.exists(path))) {
-    await FS.writeFile(path, `export default {
+    await FS.writeFile(path, `module.exports = {
   migrationsTableName: "migrations",
   migrationsPath: "./migrations/",
   getConnection: async ()=>{

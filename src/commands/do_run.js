@@ -1,14 +1,11 @@
-import sortBy from 'lodash.sortby';
-import filter from 'lodash.filter';
-import isFunction from 'lodash.isfunction';
+const sortBy = require('lodash.sortby');
 
-export default async function doRun(host, migration, direction, args) {
+module.exports = async function doRun(host, migration, direction, args) {
   if (direction != "up" && direction != "down") {
     throw new Error(`Unhandled migration direction, must be 'up' or 'down' but was: '${direction}'`);
   }
   await host.withMigrationLock(async ()=>{
     const migrationStatusMap = await host.migrationStatusMap({ refresh: true });
-
     // Determine which migrations to run
     let migrations;
     if (migration) {
@@ -21,14 +18,14 @@ export default async function doRun(host, migration, direction, args) {
       }
     } else if (direction == 'up') {
       migrations = [];
-      const sortedUnappliedKeys = filter(Array.from(migrationStatusMap.keys()), (key)=>{
+      const sortedUnappliedKeys = Array.from(migrationStatusMap.keys()).filter((key)=>{
         return !migrationStatusMap.get(key).applied && migrationStatusMap.get(key).local;
       }).sort();
       for (let key of sortedUnappliedKeys) {
         migrations.push(migrationStatusMap.get(key).local);
       }
     } else if (direction == 'down') {
-      const appliedKeys = filter(Array.from(migrationStatusMap.keys()), (key)=>{
+      const appliedKeys = Array.from(migrationStatusMap.keys()).filter((key)=>{
         return migrationStatusMap.get(key).applied && migrationStatusMap.get(key).local;
       });
       const sortedKeys = sortBy(appliedKeys, (key)=>{
@@ -55,18 +52,27 @@ export default async function doRun(host, migration, direction, args) {
     // Actually run the migrations
     const conn = await host.conn();
     for (let migration of migrations) {
-      const module = require(migration.path).default;
-      if (isFunction(module[direction])) {
+      let module = require(migration.path);
+      if (module.default) {
+        module = module.default;
+      }
+      if (typeof(module[direction]) === 'function') {
         console.log(`.... ${direction} ${migration.key} ${migration.path}`);
-        await host.withTransaction(async()=>{
-          await (module[direction].bind(module, conn)());
-          await host.setMigrationStatus(migration, direction);
-          console.log(`OKAY ${direction} ${migration.key} ${migration.path}`);
-        });
+        try {
+          await host.withTransaction(async()=>{
+            await (module[direction].bind(module, conn)());
+            await host.setMigrationStatus(migration, direction);
+            console.log(`OKAY ${direction} ${migration.key} ${migration.path}`);
+          });
+        } catch(exception) {
+          console.log(`FAIL ${direction} ${migration.key} ${migration.path}`);
+          console.log(exception);
+          process.exit(1);
+        }
       } else {
         await host.withTransaction(async()=>{
           await host.setMigrationStatus(migration, direction);
-          console.log(`SKIP ${direction} ${migration.key} ${migration.path} (no such direction ${direction})`);
+          throw new Error(`${direction} ${migration.key} ${migration.path} (no such function ${direction})`);
         });
       }
     }

@@ -1,6 +1,6 @@
 {
   "name": "pg-migrations",
-  "version": "0.11.0",
+  "version": "0.22.0",
   "main": "dist/migrations_host.js",
   "license": "MIT",
   "author": {
@@ -13,20 +13,14 @@
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.35",
     "@babel/preset-env": "^7.0.0-beta.35",
+    "babel-polyfill": "^7.0.0-beta.3",
+    "babel-register": "^7.0.0-beta.3",
     "babel-cli": "^7.0.0-beta.3",
     "execa": "^0.8.0"
   },
   "dependencies": {
-    "babel-polyfill": "^7.0.0-beta.3",
-    "babel-register": "^7.0.0-beta.3",
     "async-file": "^2.0.2",
     "cli-table": "^0.3.1",
-    "lodash.filter": "^4.6.0",
-    "lodash.find": "^4.6.0",
-    "lodash.foreach": "^4.5.0",
-    "lodash.isfunction": "^3.0.8",
-    "lodash.map": "^4.6.0",
-    "lodash.merge": "^4.6.0",
     "lodash.sortby": "^4.7.0",
     "minimist": "^1.2.0"
   },

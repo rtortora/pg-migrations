@@ -21,7 +21,7 @@ Then add this to the commands in your `package.json`:
 ```json
 {
   "scripts": {
-    "migrate": "node --require babel-register --require babel-polyfill node_modules/.bin/pg-migrations"
+    "migrate": "node_modules/.bin/pg-migrations"
   }
 }
 ```
@@ -29,7 +29,7 @@ Then add this to the commands in your `package.json`:
 Then run `yarn migrate init` to create a skeleton config file which looks like so:
 
 ```js
-export default {
+module.exports = {
   migrationsTableName: "migrations",
   migrationsPath: "./migrations/",
   getConnection: async ()=>{
@@ -50,7 +50,7 @@ Run this:
 Which will create a blank migration at ./migrations/(datetime).js, looking something like this:
 
 ```js
-export default {
+module.exports = {
   up: async (pg)=>{
     // do whatever
   },

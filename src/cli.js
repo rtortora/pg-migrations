@@ -1,10 +1,10 @@
-#!/usr/bin/env node --require babel-register --require babel-polyfill
-import minimist from 'minimist';
-import MigrationsHost from './migrations_host.js';
-import doCreate from './commands/do_create';
-import doInit from './commands/do_init';
-import doRun from './commands/do_run';
-import doStatus from './commands/do_status';
+#!/usr/bin/env node
+const minimist = require('minimist');
+const MigrationsHost = require('./migrations_host.js');
+const doCreate = require('./commands/do_create');
+const doInit = require('./commands/do_init');
+const doRun = require('./commands/do_run');
+const doStatus = require('./commands/do_status');
 
 const args = minimist(process.argv.slice(2));
 

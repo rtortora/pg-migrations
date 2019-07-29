@@ -1,30 +1,21 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = doInit;
-
-var _asyncFile = _interopRequireDefault(require("async-file"));
-
-var _path = _interopRequireDefault(require("path"));
-
-var _migrations_host = require("../migrations_host");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } } function _next(value) { step("next", value); } function _throw(err) { step("throw", err); } _next(); }); }; }
 
-function doInit(_x) {
-  return _doInit.apply(this, arguments);
-}
+const FS = require('async-file');
 
-function _doInit() {
-  _doInit = _asyncToGenerator(function* (host) {
-    const path = _path.default.join(host.rootPath, _migrations_host.CONFIG_FILENAME);
+const Path = require('path');
 
-    if (!(yield _asyncFile.default.exists(path))) {
-      yield _asyncFile.default.writeFile(path, `export default {
+const {
+  CONFIG_FILENAME
+} = require('../migrations_host');
+
+module.exports =
+/*#__PURE__*/
+function () {
+  var _doInit = _asyncToGenerator(function* (host) {
+    const path = Path.join(host.rootPath, CONFIG_FILENAME);
+
+    if (!(yield FS.exists(path))) {
+      yield FS.writeFile(path, `module.exports = {
   migrationsTableName: "migrations",
   migrationsPath: "./migrations/",
   getConnection: async ()=>{
@@ -38,6 +29,9 @@ function _doInit() {
       console.log(`Already configured at ${path}`);
     }
   });
-  return _doInit.apply(this, arguments);
-}
+
+  return function doInit(_x) {
+    return _doInit.apply(this, arguments);
+  };
+}();
 //# sourceMappingURL=do_init.js.map

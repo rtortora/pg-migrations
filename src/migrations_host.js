@@ -1,16 +1,12 @@
-import FS from 'async-file';
-import Path from 'path';
-import map from 'lodash.map';
-import forEach from 'lodash.foreach';
-import isFunction from 'lodash.isfunction';
-import merge from 'lodash.merge';
+const FS = require('async-file');
+const Path = require('path');
 
-export const CONFIG_FILENAME = "migrations.config.js";
+const CONFIG_FILENAME = "migrations.config.js";
 
 /**
  * Represents a host application using the pg-migrations library.
  */
-export default class MigrationsHost {
+module.exports = class MigrationsHost {
   constructor(rootPath = null) {
     this.rootPath = rootPath || process.cwd();
   }
@@ -30,8 +26,11 @@ export default class MigrationsHost {
           throw new Error(`Cannot find ${CONFIG_FILENAME}`);
         }
       }
-      const loadedConfig = require(Path.join(this.rootPath, CONFIG_FILENAME)).default;
-      this._config = merge({
+      let loadedConfig = require(Path.join(this.rootPath, CONFIG_FILENAME));
+      if (loadedConfig.default) {
+        loadedConfig = loadedConfig.default;
+      }
+      this._config = Object.assign({
         configPath: Path.join(this.rootPath, CONFIG_FILENAME),
         migrationsTableName: "migrations",
         migrationsRelPath: "./migrations",
@@ -49,8 +48,8 @@ export default class MigrationsHost {
   async conn({ bootstrap = false } = {}) {
     if (!this._conn) {
       const config = await this.config();
-      if (!isFunction(config.getConnection)) {
-        throw new Error(`${config.configPath} does not define a getConnection method`);
+      if (typeof(config.getConnection) !== 'function') {
+        throw new Error(`${config.configPath} does not define a getConnection method, is '${typeof(config.getConnection)}'`);
       }
       this._conn = await config.getConnection();
       if (!this._conn._connecting && !this._conn._connected) {
@@ -81,7 +80,7 @@ export default class MigrationsHost {
       const config = await this.config();
       const files = await FS.readdir(config.migrationsPath);
       this._localMigrationsMap = new Map();
-      forEach(files, (filename)=>{
+      for (let filename of files) {
         const keySearch = filename.match(/([0-9]{12,14})/);
         if (keySearch) {
           const key = keySearch[1];
@@ -91,7 +90,7 @@ export default class MigrationsHost {
             path: Path.join(config.migrationsPath, filename),
           });
         }
-      });
+      }
     }
     return this._localMigrationsMap;
   }
@@ -112,12 +111,12 @@ export default class MigrationsHost {
       const config = await this.config();
       const conn = await this.conn({ bootstrap: true });
       const statuses = (await conn.query(`select "key", "filename", "migrated_at" from "${config.migrationsTableName}" order by "migrated_at"`)).rows;
-      forEach(statuses, (status)=>{
+      for (let status of statuses) {
         this._migrationStatusMap.set(status.key, {
           applied: status,
           local: localMigrationsMap.get(status.key),
         });
-      });
+      };
     }
     return this._migrationStatusMap;
   }
@@ -194,3 +193,5 @@ export default class MigrationsHost {
     }
   }
 }
+
+module.exports.CONFIG_FILENAME = CONFIG_FILENAME;

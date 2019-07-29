@@ -1,34 +1,15 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = exports.CONFIG_FILENAME = void 0;
-
-var _asyncFile = _interopRequireDefault(require("async-file"));
-
-var _path = _interopRequireDefault(require("path"));
-
-var _lodash = _interopRequireDefault(require("lodash.map"));
-
-var _lodash2 = _interopRequireDefault(require("lodash.foreach"));
-
-var _lodash3 = _interopRequireDefault(require("lodash.isfunction"));
-
-var _lodash4 = _interopRequireDefault(require("lodash.merge"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } } function _next(value) { step("next", value); } function _throw(err) { step("throw", err); } _next(); }); }; }
+
+const FS = require('async-file');
+
+const Path = require('path');
 
 const CONFIG_FILENAME = "migrations.config.js";
 /**
  * Represents a host application using the pg-migrations library.
  */
 
-exports.CONFIG_FILENAME = CONFIG_FILENAME;
-
-class MigrationsHost {
+module.exports = class MigrationsHost {
   constructor(rootPath = null) {
     this.rootPath = rootPath || process.cwd();
   }
@@ -44,25 +25,29 @@ class MigrationsHost {
     return _asyncToGenerator(function* () {
       if (!_this._config) {
         while (true) {
-          if (yield _asyncFile.default.exists(_path.default.join(_this.rootPath, CONFIG_FILENAME), _asyncFile.default.constants.R_OK)) {
+          if (yield FS.exists(Path.join(_this.rootPath, CONFIG_FILENAME), FS.constants.R_OK)) {
             break;
           }
 
-          _this.rootPath = _path.default.dirname(_this.rootPath);
+          _this.rootPath = Path.dirname(_this.rootPath);
 
           if (_this.rootPath == "/") {
             throw new Error(`Cannot find ${CONFIG_FILENAME}`);
           }
         }
 
-        const loadedConfig = require(_path.default.join(_this.rootPath, CONFIG_FILENAME)).default;
+        let loadedConfig = require(Path.join(_this.rootPath, CONFIG_FILENAME));
 
-        _this._config = (0, _lodash4.default)({
-          configPath: _path.default.join(_this.rootPath, CONFIG_FILENAME),
+        if (loadedConfig.default) {
+          loadedConfig = loadedConfig.default;
+        }
+
+        _this._config = Object.assign({
+          configPath: Path.join(_this.rootPath, CONFIG_FILENAME),
           migrationsTableName: "migrations",
           migrationsRelPath: "./migrations"
         }, loadedConfig);
-        _this._config.migrationsPath = _path.default.join(_this.rootPath, _this._config.migrationsRelPath);
+        _this._config.migrationsPath = Path.join(_this.rootPath, _this._config.migrationsRelPath);
       }
 
       return _this._config;
@@ -84,8 +69,8 @@ class MigrationsHost {
       if (!_this2._conn) {
         const config = yield _this2.config();
 
-        if (!(0, _lodash3.default)(config.getConnection)) {
-          throw new Error(`${config.configPath} does not define a getConnection method`);
+        if (typeof config.getConnection !== 'function') {
+          throw new Error(`${config.configPath} does not define a getConnection method, is '${typeof config.getConnection}'`);
         }
 
         _this2._conn = yield config.getConnection();
@@ -125,9 +110,10 @@ class MigrationsHost {
     return _asyncToGenerator(function* () {
       if (!_this3._localMigrationsMap || refresh) {
         const config = yield _this3.config();
-        const files = yield _asyncFile.default.readdir(config.migrationsPath);
+        const files = yield FS.readdir(config.migrationsPath);
         _this3._localMigrationsMap = new Map();
-        (0, _lodash2.default)(files, filename => {
+
+        for (let filename of files) {
           const keySearch = filename.match(/([0-9]{12,14})/);
 
           if (keySearch) {
@@ -136,10 +122,10 @@ class MigrationsHost {
             _this3._localMigrationsMap.set(key, {
               key,
               filename,
-              path: _path.default.join(config.migrationsPath, filename)
+              path: Path.join(config.migrationsPath, filename)
             });
           }
-        });
+        }
       }
 
       return _this3._localMigrationsMap;
@@ -173,12 +159,15 @@ class MigrationsHost {
           bootstrap: true
         });
         const statuses = (yield conn.query(`select "key", "filename", "migrated_at" from "${config.migrationsTableName}" order by "migrated_at"`)).rows;
-        (0, _lodash2.default)(statuses, status => {
+
+        for (let status of statuses) {
           _this4._migrationStatusMap.set(status.key, {
             applied: status,
             local: localMigrationsMap.get(status.key)
           });
-        });
+        }
+
+        ;
       }
 
       return _this4._migrationStatusMap;
@@ -206,7 +195,7 @@ class MigrationsHost {
       const migrationStatusMap = yield _this5.migrationStatusMap();
 
       if (status == 'up' && !migrationStatusMap.get(migration.key).applied) {
-        yield conn.query(`insert into "${config.migrationsTableName}" (key, filename) values ($1, $2)`, [migration.key, _path.default.basename(migration.path, ".js")]);
+        yield conn.query(`insert into "${config.migrationsTableName}" (key, filename) values ($1, $2)`, [migration.key, Path.basename(migration.path, ".js")]);
       } else if (status == 'down' && migrationStatusMap.get(migration.key).applied) {
         yield conn.query(`delete from "${config.migrationsTableName}" where key = $1`, [migration.key]);
       }
@@ -275,7 +264,6 @@ class MigrationsHost {
     })();
   }
 
-}
-
-exports.default = MigrationsHost;
+};
+module.exports.CONFIG_FILENAME = CONFIG_FILENAME;
 //# sourceMappingURL=migrations_host.js.map
