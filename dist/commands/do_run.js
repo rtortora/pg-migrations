@@ -80,13 +80,25 @@ function () {
           console.log(`.... ${direction} ${migration.key} ${migration.path}`);
 
           try {
-            yield host.withTransaction(
+            const execute =
             /*#__PURE__*/
-            _asyncToGenerator(function* () {
-              yield module[direction].bind(module, conn)();
-              yield host.setMigrationStatus(migration, direction);
-              console.log(`OKAY ${direction} ${migration.key} ${migration.path}`);
-            }));
+            function () {
+              var _ref2 = _asyncToGenerator(function* () {
+                yield module[direction].bind(module, conn)();
+                yield host.setMigrationStatus(migration, direction);
+                console.log(`OKAY ${direction} ${migration.key} ${migration.path}`);
+              });
+
+              return function execute() {
+                return _ref2.apply(this, arguments);
+              };
+            }();
+
+            if (module.disableTransaction) {
+              yield execute();
+            } else {
+              yield host.withTransaction(execute);
+            }
           } catch (exception) {
             console.log(`FAIL ${direction} ${migration.key} ${migration.path}`);
             console.log(exception);
