@@ -59,11 +59,16 @@ module.exports = async function doRun(host, migration, direction, args) {
       if (typeof(module[direction]) === 'function') {
         console.log(`.... ${direction} ${migration.key} ${migration.path}`);
         try {
-          await host.withTransaction(async()=>{
+          const execute = async()=>{
             await (module[direction].bind(module, conn)());
             await host.setMigrationStatus(migration, direction);
             console.log(`OKAY ${direction} ${migration.key} ${migration.path}`);
-          });
+          };
+          if (module.disableTransaction) {
+            await execute();
+          } else {
+            await host.withTransaction(execute);
+          }
         } catch(exception) {
           console.log(`FAIL ${direction} ${migration.key} ${migration.path}`);
           console.log(exception);
