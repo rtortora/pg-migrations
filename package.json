@@ -20,7 +20,7 @@
     "async-file": "^2.0.2",
     "cli-table": "^0.3.1",
     "lodash.sortby": "^4",
-    "minimist": "^1.2.0"
+    "minimist": "^1.2.2"
   },
   "peerDependencies": {
     "pg": "^7.x"
