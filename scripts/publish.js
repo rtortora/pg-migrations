@@ -30,7 +30,7 @@ async function shell(command, options = {}) {
     const version = pkg.version.split(".").map((x)=>parseInt(x));
     let nextVersion;
     if (args.major) {
-      nextVersion = [version[0] + 1, version[1], version[2]].join('.');
+      nextVersion = [version[0] + 1, 0, 0].join('.');
     } else if (args.patch) {
       nextVersion = [version[0], version[1], version[2] + 1].join('.');
     } else {
