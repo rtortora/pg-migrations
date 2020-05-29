@@ -17,6 +17,8 @@ const doRun = require('./commands/do_run');
 
 const doStatus = require('./commands/do_status');
 
+const doTidy = require('./commands/do_tidy');
+
 const args = minimist(process.argv.slice(2));
 
 _asyncToGenerator(function* () {
@@ -35,6 +37,8 @@ _asyncToGenerator(function* () {
       yield doRun(host, null, 'up', args);
     } else if (command == 'down') {
       yield doRun(host, null, 'down', args);
+    } else if (command == 'tidy' || command == 'tidyup') {
+      yield doTidy(host, args);
     } else {
       const localMigrationsMap = yield host.localMigrationsMap();
 

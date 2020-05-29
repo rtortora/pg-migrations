@@ -114,25 +114,47 @@ module.exports = class MigrationsHost {
     return _asyncToGenerator(function* () {
       if (!_this3._localMigrationsMap || refresh) {
         const config = yield _this3.config();
-        const files = yield FS.readdir(config.migrationsPath);
         _this3._localMigrationsMap = new Map();
+        yield _this3._scanFolderIntoLocalMigrationsMap(config, config.migrationsPath, {
+          checkSubfolders: true
+        });
+      }
 
-        for (let filename of files) {
-          const keySearch = filename.match(/([0-9]{12,14})/);
+      return _this3._localMigrationsMap;
+    })();
+  }
+
+  _scanFolderIntoLocalMigrationsMap(config, path, {
+    checkSubfolders = true
+  } = {}) {
+    var _this4 = this;
+
+    return _asyncToGenerator(function* () {
+      for (let filename of yield FS.readdir(path)) {
+        if ((yield FS.stat(Path.join(path, filename))).isDirectory()) {
+          yield _this4._scanFolderIntoLocalMigrationsMap(config, Path.join(path, filename), {
+            checkSubfolders: true
+          });
+        } else {
+          const keySearch = filename.match(/(^[0-9]{12,14})/);
 
           if (keySearch) {
             const key = keySearch[1];
 
-            _this3._localMigrationsMap.set(key, {
+            _this4._localMigrationsMap.set(key, {
               key,
               filename,
               path: Path.join(config.migrationsPath, filename)
             });
+          } else {
+            const tidySearch = filename.match(/^[0-9]{4}-[0-9]{2}$/i);
+
+            if (tidySearch) {
+              console.log(`GOT HERE!!! ${tidySearch}`);
+            }
           }
         }
       }
-
-      return _this3._localMigrationsMap;
     })();
   }
   /**
@@ -145,27 +167,27 @@ module.exports = class MigrationsHost {
   migrationStatusMap({
     refresh = false
   } = {}) {
-    var _this4 = this;
+    var _this5 = this;
 
     return _asyncToGenerator(function* () {
-      if (!_this4._migrationStatusMap || refresh) {
-        const localMigrationsMap = yield _this4.localMigrationsMap();
-        _this4._migrationStatusMap = new Map();
+      if (!_this5._migrationStatusMap || refresh) {
+        const localMigrationsMap = yield _this5.localMigrationsMap();
+        _this5._migrationStatusMap = new Map();
 
         for (let [key, migration] of localMigrationsMap) {
-          _this4._migrationStatusMap.set(key, {
+          _this5._migrationStatusMap.set(key, {
             local: migration
           });
         }
 
-        const config = yield _this4.config();
-        const conn = yield _this4.conn({
+        const config = yield _this5.config();
+        const conn = yield _this5.conn({
           bootstrap: true
         });
         const statuses = (yield conn.query(`select "key", "filename", "migrated_at" from "${config.migrationsTableName}" order by "migrated_at"`)).rows;
 
         for (let status of statuses) {
-          _this4._migrationStatusMap.set(status.key, {
+          _this5._migrationStatusMap.set(status.key, {
             applied: status,
             local: localMigrationsMap.get(status.key)
           });
@@ -174,7 +196,7 @@ module.exports = class MigrationsHost {
         ;
       }
 
-      return _this4._migrationStatusMap;
+      return _this5._migrationStatusMap;
     })();
   }
   /**
@@ -185,18 +207,18 @@ module.exports = class MigrationsHost {
 
 
   setMigrationStatus(migration, status) {
-    var _this5 = this;
+    var _this6 = this;
 
     return _asyncToGenerator(function* () {
       if (status != 'up' && status != 'down') {
         throw new Error(`Unhandled status, must be 'up' or 'down' but was: '${status}'`);
       }
 
-      const config = yield _this5.config();
-      const conn = yield _this5.conn({
+      const config = yield _this6.config();
+      const conn = yield _this6.conn({
         bootstrap: true
       });
-      const migrationStatusMap = yield _this5.migrationStatusMap();
+      const migrationStatusMap = yield _this6.migrationStatusMap();
 
       if (status == 'up' && !migrationStatusMap.get(migration.key).applied) {
         yield conn.query(`insert into "${config.migrationsTableName}" (key, filename) values ($1, $2)`, [migration.key, Path.basename(migration.path, ".js")]);
@@ -213,24 +235,24 @@ module.exports = class MigrationsHost {
 
 
   withMigrationLock(fn) {
-    var _this6 = this;
+    var _this7 = this;
 
     return _asyncToGenerator(function* () {
-      if (_this6._withMigrationLock) {
+      if (_this7._withMigrationLock) {
         return yield fn();
       } else {
-        const config = yield _this6.config();
-        const conn = yield _this6.conn({
+        const config = yield _this7.config();
+        const conn = yield _this7.conn({
           bootstrap: true
         });
-        _this6._withMigrationLock = true;
+        _this7._withMigrationLock = true;
         yield conn.query(`select pg_advisory_lock(1) from "${config.migrationsTableName}"`);
 
         try {
           return yield fn();
         } finally {
           yield conn.query(`select pg_advisory_unlock(1) from "${config.migrationsTableName}"`);
-          _this6._withMigrationLock = false;
+          _this7._withMigrationLock = false;
         }
       }
     })();
@@ -243,15 +265,15 @@ module.exports = class MigrationsHost {
 
 
   withTransaction(fn) {
-    var _this7 = this;
+    var _this8 = this;
 
     return _asyncToGenerator(function* () {
-      if (_this7._withTransaction) {
+      if (_this8._withTransaction) {
         return yield fn();
       } else {
-        const config = yield _this7.config();
-        const conn = yield _this7.conn();
-        _this7._withTransaction = true;
+        const config = yield _this8.config();
+        const conn = yield _this8.conn();
+        _this8._withTransaction = true;
         yield conn.query(`begin`);
 
         try {
@@ -262,7 +284,7 @@ module.exports = class MigrationsHost {
           yield conn.query("rollback");
           throw exception;
         } finally {
-          _this7._withTransaction = false;
+          _this8._withTransaction = false;
         }
       }
     })();
