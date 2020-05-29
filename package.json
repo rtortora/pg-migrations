@@ -1,20 +1,20 @@
 {
   "name": "pg-migrations",
   "version": "0.26.0",
-  "main": "dist/migrations_host.js",
+  "main": "src/migrations_host.js",
   "license": "MIT",
+  "engines": {
+    "node": ">=6"
+  },
   "author": {
     "name": "Richard Tortora",
     "email": "richard.tortora@gmail.com"
   },
   "bin": {
-    "pg-migrations": "./dist/bin/pg-migrations"
+    "pg-migrations": "./src/bin/pg-migrations"
   },
-  "devDependencies": {
-    "@babel/cli": "^7.5",
-    "@babel/core": "^7.5",
-    "@babel/preset-env": "^7.5",
-    "execa": "^0.8.0"
+  "scripts": {
+    "publish": "./scripts/publish.js"
   },
   "dependencies": {
     "async-file": "^2.0.2",
@@ -24,8 +24,5 @@
   },
   "peerDependencies": {
     "pg": "^7.x"
-  },
-  "scripts": {
-    "build": "scripts/build.js"
   }
 }
