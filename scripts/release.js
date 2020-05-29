@@ -50,7 +50,7 @@ async function shell(command, options = {}) {
       git push &&
       git tag -a v${nextVersion} -m 'v${nextVersion}' &&
       git push origin v${nextVersion} &&
-      git checkout master &&
+      git checkout master
     `);
   } catch(exception) {
     console.error(exception);
