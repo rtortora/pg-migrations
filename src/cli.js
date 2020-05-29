@@ -18,7 +18,7 @@ const args = minimist(process.argv.slice(2));
       await doInit(host);
     } else if (command == 'create') {
       await doCreate(host, args);
-    } else if (command == 'status') {
+    } else if (command == 'status' || !command) {
       await doStatus(host, args);
     } else if (command == 'up') {
       await doRun(host, null, 'up', args);
@@ -27,13 +27,7 @@ const args = minimist(process.argv.slice(2));
     } else if (command == 'tidy' || command == 'tidyup') {
       await doTidy(host, args);
     } else {
-      const localMigrationsMap = await host.localMigrationsMap();
-      if (localMigrationsMap.has(command)) {
-        await doRun(host, localMigrationsMap.get(command), args._.shift(), args);
-      } else {
-        console.log(`Can't find migration by key '${command}'`);
-        process.exit(1);
-      }
+      console.log("What? Commands are: init, create, status, up, down, tidy");
     }
     process.exit(0);
   } catch(exception) {

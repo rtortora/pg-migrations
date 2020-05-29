@@ -1,12 +1,19 @@
 const Table = require('cli-table');
-const sortBy = require('lodash.sortby');
 
 module.exports = async function doStatus(host, args) {
   const migrationStatusMap = await host.migrationStatusMap();
-  const sortedKeys = sortBy(Array.from(migrationStatusMap.keys()), [
-    (key)=>{ return migrationStatusMap.get(key).applied ? 0 : 1 },
-    (key)=>{ return migrationStatusMap.get(key).applied ? migrationStatusMap.get(key).applied.migrated_at : key },
-  ]);
+  const sortedKeys = Array.from(migrationStatusMap.keys());
+  sortedKeys.sort((a, b)=>{
+    const statusA = migrationStatusMap.get(a);
+    const statusB = migrationStatusMap.get(b);
+    if (statusA.applied && statusB.applied) {
+      return statusA.applied.migrated_at.toISOString().localeCompare(statusB.applied.migrated_at.toISOString());
+    } else if (statusA.applied && !statusB.applied) {
+      return -1;
+    } else {
+      return 1;
+    }
+  });
   const table = new Table({
     head: [ "Key", "Status", "Path" ],
   });
@@ -14,7 +21,7 @@ module.exports = async function doStatus(host, args) {
     const status = migrationStatusMap.get(key);
     table.push([
       key,
-      status.applied ? `up at ${status.applied.migrated_at}` : `down`,
+      status.applied ? `up at ${status.applied.migrated_at.toISOString()}` : `down`,
       status.local ? status.local.filename : `*** NO FILE ***`,
     ]);
   }

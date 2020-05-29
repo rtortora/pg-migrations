@@ -1,6 +1,4 @@
-const sortBy = require('lodash.sortby');
-
-module.exports = async function doRun(host, migration, direction, args) {
+module.exports = async function doRun(host, migrationName, direction, args) {
   if (direction != "up" && direction != "down") {
     throw new Error(`Unhandled migration direction, must be 'up' or 'down' but was: '${direction}'`);
   }
@@ -8,7 +6,12 @@ module.exports = async function doRun(host, migration, direction, args) {
     const migrationStatusMap = await host.migrationStatusMap({ refresh: true });
     // Determine which migrations to run
     let migrations;
-    if (migration) {
+    if (migrationName) {
+      const migration = localMigrationsMap.get(migrationName);
+      if (!migration) {
+        console.error(`No such migration: ${migrationName}`);
+        return;
+      }
       if (args.force ||
           (direction == 'up' && !migrationStatusMap.get(migration.key).applied) ||
           (direction == 'down' && migrationStatusMap.get(migration.key).applied)) {
@@ -28,8 +31,11 @@ module.exports = async function doRun(host, migration, direction, args) {
       const appliedKeys = Array.from(migrationStatusMap.keys()).filter((key)=>{
         return migrationStatusMap.get(key).applied && migrationStatusMap.get(key).local;
       });
-      const sortedKeys = sortBy(appliedKeys, (key)=>{
-        return migrationStatusMap.get(key).applied.migrated_at;
+      const sortedKeys = new Array(appliedKeys);
+      sortedKeys.sort((a, b)=>{
+        const statusA = migrationStatusMap.get(a);
+        const statusB = migrationStatusMap.get(b);
+        return statusA.applied.migrated_at.toISOString().localeCompare(statusB.applied.migrated_at.toISOString());
       });
       const targetKey = sortedKeys[sortedKeys.length - 1];
       if (targetKey) {

@@ -60,7 +60,7 @@ module.exports = {
 };
 ```
 
-Note that any string can follow after or before the datetime, so you are free to name your files anything.
+Note that any string can follow after the datetime, so you are free to name your files anything. If you want to add a postfix in the create command, you can do `yarn migrate create postfix-here` or `yarn migrate create --name postfix-here`.
 
 ## Tidying Up
 
@@ -88,7 +88,6 @@ To undo the most recent migration as determined by the time of migration (not th
 
 To run a specific migration up or down, run:
 
-    yarn migrate (datetime) up/down
+    yarn migrate up/down (datetime)
 
 For any up/down, you can --dryrun to see what files it will run first.
-

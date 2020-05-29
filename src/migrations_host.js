@@ -97,13 +97,8 @@ module.exports = class MigrationsHost {
           this._localMigrationsMap.set(key, {
             key,
             filename,
-            path: Path.join(config.migrationsPath, filename),
+            path: Path.join(path, filename),
           });
-        } else {
-          const tidySearch = filename.match(/^[0-9]{4}-[0-9]{2}$/i);
-          if (tidySearch) {
-            console.log(`GOT HERE!!! ${tidySearch}`);
-          }
         }
       }
     }
