@@ -5,6 +5,7 @@ const doCreate = require('./commands/do_create');
 const doInit = require('./commands/do_init');
 const doRun = require('./commands/do_run');
 const doStatus = require('./commands/do_status');
+const doTidy = require('./commands/do_tidy');
 
 const args = minimist(process.argv.slice(2));
 
@@ -23,6 +24,8 @@ const args = minimist(process.argv.slice(2));
       await doRun(host, null, 'up', args);
     } else if (command == 'down') {
       await doRun(host, null, 'down', args);
+    } else if (command == 'tidy' || command == 'tidyup') {
+      await doTidy(host, args);
     } else {
       const localMigrationsMap = await host.localMigrationsMap();
       if (localMigrationsMap.has(command)) {

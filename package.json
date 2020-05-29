@@ -11,9 +11,9 @@
     "pg-migrations": "./dist/bin/pg-migrations"
   },
   "devDependencies": {
+    "@babel/cli": "^7.5",
     "@babel/core": "^7.5",
     "@babel/preset-env": "^7.5",
-    "@babel/cli": "^7.5",
     "execa": "^0.8.0"
   },
   "dependencies": {

@@ -62,6 +62,16 @@ module.exports = {
 
 Note that any string can follow after or before the datetime, so you are free to name your files anything.
 
+## Tidying Up
+
+Once you've got a lot of migrations, it can be kind of annoying to have a folder with a thousand migrations in it. This library supports any number of subfolders in the migrations folder, so you can organize them however you like. The names of the subfolders don't matter, it always uses the filename's timestamp to order the resulting migrations.
+
+Additionally, if you run:
+
+    yarn migrate tidy
+
+Then it will move all migrations in the root migration folder into subfolders based on the year and month of their timestamp.
+
 ## Operating Migrations
 
 To see the status of all migrations, run:

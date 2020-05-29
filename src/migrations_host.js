@@ -78,10 +78,20 @@ module.exports = class MigrationsHost {
   async localMigrationsMap({ refresh = false } = {}) {
     if (!this._localMigrationsMap || refresh) {
       const config = await this.config();
-      const files = await FS.readdir(config.migrationsPath);
       this._localMigrationsMap = new Map();
-      for (let filename of files) {
-        const keySearch = filename.match(/([0-9]{12,14})/);
+      await this._scanFolderIntoLocalMigrationsMap(config, config.migrationsPath, {
+        checkSubfolders: true,
+      });
+    }
+    return this._localMigrationsMap;
+  }
+
+  async _scanFolderIntoLocalMigrationsMap(config, path, { checkSubfolders = true } = {}) {
+    for (let filename of await FS.readdir(path)) {
+      if ((await FS.stat(Path.join(path, filename))).isDirectory()) {
+        await this._scanFolderIntoLocalMigrationsMap(config, Path.join(path, filename), { checkSubfolders: true });
+      } else {
+        const keySearch = filename.match(/(^[0-9]{12,14})/);
         if (keySearch) {
           const key = keySearch[1];
           this._localMigrationsMap.set(key, {
@@ -89,10 +99,14 @@ module.exports = class MigrationsHost {
             filename,
             path: Path.join(config.migrationsPath, filename),
           });
+        } else {
+          const tidySearch = filename.match(/^[0-9]{4}-[0-9]{2}$/i);
+          if (tidySearch) {
+            console.log(`GOT HERE!!! ${tidySearch}`);
+          }
         }
       }
     }
-    return this._localMigrationsMap;
   }
 
   /**
