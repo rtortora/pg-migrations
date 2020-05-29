@@ -14,7 +14,7 @@
     "pg-migrations": "./src/bin/pg-migrations"
   },
   "scripts": {
-    "publish": "./scripts/publish.js"
+    "release": "./scripts/release.js"
   },
   "dependencies": {
     "async-file": "^2.0.2",
