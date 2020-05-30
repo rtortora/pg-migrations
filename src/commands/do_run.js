@@ -31,7 +31,7 @@ module.exports = async function doRun(host, migrationName, direction, args) {
       const appliedKeys = Array.from(migrationStatusMap.keys()).filter((key)=>{
         return migrationStatusMap.get(key).applied && migrationStatusMap.get(key).local;
       });
-      const sortedKeys = new Array(appliedKeys);
+      const sortedKeys = [...appliedKeys];
       sortedKeys.sort((a, b)=>{
         const statusA = migrationStatusMap.get(a);
         const statusB = migrationStatusMap.get(b);
