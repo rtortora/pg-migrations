@@ -26,6 +26,16 @@ Then add this to the commands in your `package.json`:
 }
 ```
 
+If you are using typescript, make sure you have ts-node in your development dependencies, then instead add this to your commands in your `package.json`:
+
+```json
+{
+  "scripts": {
+    "migrate": "node_modules/.bin/pg-migrations-ts"
+  }
+}
+```
+
 Then run `yarn migrate init` to create a skeleton config file which looks like so:
 
 ```js
