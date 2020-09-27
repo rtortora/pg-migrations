@@ -11,7 +11,8 @@
     "email": "richard.tortora@gmail.com"
   },
   "bin": {
-    "pg-migrations": "./src/bin/pg-migrations"
+    "pg-migrations": "./src/bin/pg-migrations",
+    "pg-migrations-ts": "./src/bin/pg-migrations-ts"
   },
   "scripts": {
     "release": "./scripts/release.js"
