@@ -17,13 +17,15 @@ module.exports = class MigrationsHost {
    */
   async config() {
     if (!this._config) {
+      const checkedPaths = [];
       while (true) {
+        checkedPaths.push(Path.join(this.rootPath, CONFIG_FILENAME));
         if (await FS.exists(Path.join(this.rootPath, CONFIG_FILENAME), FS.constants.R_OK)) {
           break;
         }
         this.rootPath = Path.dirname(this.rootPath);
         if (this.rootPath == "/") {
-          throw new Error(`Cannot find ${CONFIG_FILENAME}`);
+          throw new Error(`Cannot find ${CONFIG_FILENAME}, checked paths:\n${checkedPaths.join("\n")}`);
         }
       }
       let loadedConfig = require(Path.join(this.rootPath, CONFIG_FILENAME));
