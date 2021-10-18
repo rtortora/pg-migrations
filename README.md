@@ -4,9 +4,13 @@ Are you using node-postgres and find [node-pg-migrate](https://github.com/salsit
 
 Nota Bene: You should probably just use [node-pg-migrate](https://github.com/salsita/node-pg-migrate) instead.
 
-All migrations are run in a transaction. If any fail, it rolls the transaction back, and stops what it's doing.
+## Features
 
-pg-migrations uses advisory locks to ensure that multiple instances of your app won't run the same migrations at the same time (for multi-server deployments). That being said, it's not super tested.
+* Migrations can be written in TypeScript, Javascript, or SQL. SQL migrations allow you to benefit from proper SQL color highlighting in your favorite editor.
+* All migrations are run in a transaction. If any fail, it rolls the transaction back, and stops what it's doing.
+* Advisory locks are used to ensure that multiple instances of your app won't run the same migrations at the same time (for multi-server deployments).
+* Migrations can be arbitarily deep, and pg-migrations has a 'tidy' tool that will automatically group migrations by year and month.
+* Easily controlled template for new migrations.
 
 ## Installation
 

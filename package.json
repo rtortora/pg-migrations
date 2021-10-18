@@ -18,11 +18,19 @@
     "release": "./scripts/release.js"
   },
   "dependencies": {
-    "async-file": "^2.0.2",
-    "cli-table": "^0.3.1",
+    "cli-table": "^0.3.6",
     "minimist": "^1.2.3"
   },
   "peerDependencies": {
-    "pg": "^7.x"
+    "pg": "^8.7.1"
+  },
+  "devDependencies": {
+    "@types/cli-table": "^0.3.0",
+    "@types/minimist": "^1.2.2",
+    "@types/node": "^16.11.1",
+    "@types/pg": "^8.6.1",
+    "pg": "^8.7.1",
+    "ts-node": "^10.3.0",
+    "typescript": "^4.4.4"
   }
 }
