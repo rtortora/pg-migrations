@@ -1,4 +1,4 @@
-import { Config } from './config';
+import { Config } from '../config';
 import { getClient } from './pg_client';
 
 export async function initMigrationsTable(config: Config): Promise<void> {

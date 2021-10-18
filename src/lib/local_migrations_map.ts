@@ -1,7 +1,7 @@
-import { Context } from './config';
+import { Context } from '../config';
 import { promises as FS } from 'fs';
 import Path from 'path';
-import { combineMaps } from './util/combine_maps';
+import { combineMaps } from '../util/combine_maps';
 
 export type ScriptLocalMigration = {
   type: 'ts' | 'js';

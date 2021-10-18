@@ -1,6 +1,6 @@
 import { Context } from "../config";
-import { LocalMigration } from "../local_migrations_map";
-import { getMigrationStatusMap } from "../migration_status_map";
+import { LocalMigration } from "../lib/local_migrations_map";
+import { getMigrationStatusMap } from "../lib/migration_status_map";
 import Table from 'cli-table';
 
 export async function doStatus(context: Context) {

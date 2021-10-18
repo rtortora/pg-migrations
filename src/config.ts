@@ -1,6 +1,6 @@
 import path from 'path';
 import { fileExists } from './util/file_exists';
-import type { MigrationType } from './local_migrations_map';
+import type { MigrationType } from './lib/local_migrations_map';
 
 const ConfigFileNames: string[] = [
   "migrations.config.ts",

@@ -1,5 +1,5 @@
 import { Client } from 'pg';
-import { Config } from './config';
+import { Config } from '../config';
 import { initMigrationsTable } from './init_migrations_table';
 
 let client: Client | null = null;
