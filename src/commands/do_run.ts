@@ -1,4 +1,15 @@
-module.exports = async function doRun(host, migrationName, direction, args) {
+import { Context } from "../context";
+
+export type RunArgs = {
+  direction: 'up' | 'down',
+  key?: string,
+};
+
+export async function doRun(context: Context, { direction, key }: RunArgs): Promise<void> {
+
+}
+
+/*module.exports = async function doRun(host, migrationName, direction, args) {
   if (direction != "up" && direction != "down") {
     throw new Error(`Unhandled migration direction, must be 'up' or 'down' but was: '${direction}'`);
   }
@@ -91,3 +102,4 @@ module.exports = async function doRun(host, migrationName, direction, args) {
     console.log(`Complete!`);
   });
 }
+*/

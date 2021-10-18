@@ -1,4 +1,4 @@
-import { Context } from "../config";
+import { Context } from "../context";
 import { ExecutedMigration, getExecutedMigrationsMap } from "./executed_migrations_map";
 import { getLocalMigrationsMap, LocalMigration } from "./local_migrations_map";
 

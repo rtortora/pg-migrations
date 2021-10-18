@@ -1,4 +1,4 @@
-import { Config } from "../config";
+import { Context } from "../context";
 import { getClient } from "./pg_client";
 
 export type ExecutedMigration = {
@@ -9,12 +9,12 @@ export type ExecutedMigration = {
 
 export type ExecutedMigrationsMap = Map<string, ExecutedMigration>;
 
-export async function getExecutedMigrationsMap(config: Config): Promise<ExecutedMigrationsMap> {
+export async function getExecutedMigrationsMap(context: Context): Promise<ExecutedMigrationsMap> {
   const map: ExecutedMigrationsMap = new Map();
-  const pg = await getClient(config);
+  const pg = await getClient(context);
   for (const row of (await pg.query(`
     select "key", "filename", "migrated_at" as "migratedAt"
-    from "${config.migrationsTableName}"
+    from "${context.migrationsTableName}"
     order by "migrated_at" asc
   `)).rows as ExecutedMigration[]) {
     map.set(row.key, row);

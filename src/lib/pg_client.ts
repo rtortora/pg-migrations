@@ -1,18 +1,19 @@
 import { Client } from 'pg';
-import { Config } from '../config';
+import { Context } from '../context';
 import { initMigrationsTable } from './init_migrations_table';
 
-let client: Client | null = null;
+const createdClients: Client[] = [];
 
-export function hasClient(): boolean {
-  return !!client;
+export function getCreatedClients(): Client[] {
+  return createdClients;
 }
 
-export async function getClient(config: Config): Promise<Client> {
-  if (!client) {
-    client = new Client({ ...config.pg });
-    await client.connect();
-    await initMigrationsTable(config);
+export async function getClient(context: Context): Promise<Client> {
+  if (!context.client) {
+    context.client = new Client({ ...context.pg });
+    createdClients.push(context.client);
+    await context.client.connect();
+    await initMigrationsTable(context);
   }
-  return client;
+  return context.client;
 }

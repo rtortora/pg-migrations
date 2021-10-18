@@ -1,4 +1,4 @@
-import { Context } from "../config";
+import { Context } from "../context";
 import { LocalMigration } from "../lib/local_migrations_map";
 import { getMigrationStatusMap } from "../lib/migration_status_map";
 import Table from 'cli-table';

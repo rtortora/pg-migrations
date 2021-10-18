@@ -1,4 +1,4 @@
-import { Context } from '../config';
+import { Context } from '../context';
 import { promises as FS } from 'fs';
 import Path from 'path';
 import { combineMaps } from '../util/combine_maps';
