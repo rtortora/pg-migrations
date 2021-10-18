@@ -3,20 +3,20 @@ import { promises as FS } from 'fs';
 import Path from 'path';
 import { combineMaps } from '../util/combine_maps';
 
-export type ScriptLocalMigration = {
+export type LocalScriptMigration = {
   type: 'ts' | 'js';
   key: string,
   path: string,
 };
 
-export type SqlLocalMigration = {
+export type LocalSqlMigration = {
   type: 'sql';
   key: string,
   upPath?: string | null,
   downPath?: string | null,
 };
 
-export type LocalMigration = ScriptLocalMigration | SqlLocalMigration;
+export type LocalMigration = LocalScriptMigration | LocalSqlMigration;
 
 export type MigrationType = LocalMigration['type'];
 
@@ -38,14 +38,14 @@ async function scanFolderForLocalMigrations(scanPath: string): Promise<LocalMigr
       if (keySearch) {
         const key = keySearch[1];
         if (/[_-](up|down)\.sql$/i.test(filename)) {
-          let prop: keyof(SqlLocalMigration) = /-down\.sql$/i.test(filename) ? "downPath" : "upPath";
+          let prop: keyof(LocalSqlMigration) = /-down\.sql$/i.test(filename) ? "downPath" : "upPath";
           if (!scanned.has(key)) {
             scanned.set(key, { type: 'sql', key, [prop]: Path.join(scanPath, filename) });
           } else {
             if (scanned.get(key)!.type !== 'sql') {
               throw new Error(`Local migrations mismatch, can't mix sql up/down and ts/js`);
             }
-            const sqlLocalMigration: SqlLocalMigration = scanned.get(key) as SqlLocalMigration;
+            const sqlLocalMigration: LocalSqlMigration = scanned.get(key) as LocalSqlMigration;
             sqlLocalMigration[prop] = Path.join(scanPath, filename);
           }
         } else {

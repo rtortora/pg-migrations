@@ -15,7 +15,8 @@
     "pg-migrations-ts": "./src/bin/pg-migrations-ts"
   },
   "scripts": {
-    "release": "./scripts/release.js"
+    "release": "./scripts/release.js",
+    "build": "tsc"
   },
   "dependencies": {
     "cli-table": "^0.3.6",

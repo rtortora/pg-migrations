@@ -1,3 +1,4 @@
+/*
 import path from 'path';
 import { promises as fs } from 'fs';
 import { fileExists } from '../util/file_exists';
@@ -23,3 +24,4 @@ export async function doTidy(migrationController, args: TidyArgs = {}) {
     );
   }
 }
+*/

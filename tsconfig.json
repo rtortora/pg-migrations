@@ -2,7 +2,7 @@
   "extends": "@tsconfig/node16/tsconfig.json",
   "compilerOptions": {
     "outDir": "dist/",
-    "rootDir": "./",
+    "rootDir": "./src",
     "esModuleInterop": true,
     "lib": ["ESNext"],
     "target": "ESNext"

@@ -1,3 +1,4 @@
+/*
 #!/usr/bin/env node
 const minimist = require('minimist');
 const MigrationsHost = require('./migrations_host.js');
@@ -40,3 +41,4 @@ const args = minimist(process.argv.slice(2));
     process.exit(1);
   }
 })();
+*/

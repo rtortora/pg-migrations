@@ -21,5 +21,26 @@ export async function getMigrationStatusMap(context: Context): Promise<Migration
       map.get(applied.key)!.applied = applied;
     }
   }
-  return map;
+  return sortMigrationStatusMap(map);
+}
+
+function sortMigrationStatusMap(map: MigrationStatusMap): MigrationStatusMap {
+  const sortedKeys = Array.from(map.keys());
+  sortedKeys.sort((a, b)=>{
+    const statusA = map.get(a)!;
+    const statusB = map.get(b)!;
+    if (statusA.applied && statusB.applied) {
+      return statusA.applied.migratedAt.toISOString().localeCompare(statusB.applied.migratedAt.toISOString());
+    } else if (statusA.applied && !statusB.applied) {
+      return -1;
+    } else {
+      return 1;
+    }
+  });
+
+  const sorted: MigrationStatusMap = new Map();
+  for (const key of sortedKeys) {
+    sorted.set(key, map.get(key)!);
+  }
+  return sorted;
 }

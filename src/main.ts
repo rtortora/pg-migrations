@@ -3,6 +3,7 @@ import { Context } from './context';
 import { getCreatedClients } from './lib/pg_client';
 import { doStatus } from './commands/do_status';
 import minimist from 'minimist';
+import { doRun } from './commands/do_run';
 
 async function main() {
   const args = minimist(process.argv.slice(2));
@@ -11,13 +12,23 @@ async function main() {
   const context: Context = {
     ...config,
     rootPath,
-    client: null,
-    hasMigrationLock: false,
   };
 
   const command = args._.shift();
   if (command === "status") {
     await doStatus(context);
+  } else if (command === "up") {
+    await doRun(context, {
+      direction: 'up',
+      key: args.key,
+    });
+  } else if (command === "down") {
+    await doRun(context, {
+      direction: 'down',
+      key: args.key,
+    });
+  } else {
+    throw new Error(`No such command '${command}'`);
   }
 
   for (const client of getCreatedClients()) {

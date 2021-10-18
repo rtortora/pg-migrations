@@ -1,4 +1,5 @@
-node_modules/*
-migrations/*
+dist
+node_modules
+migrations
 migrations.config.ts
 yarn-error.log
