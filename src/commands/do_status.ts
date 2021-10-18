@@ -1,7 +1,7 @@
 import { Context } from "../context";
 import { LocalMigration } from "../lib/local_migrations_map";
 import { getMigrationStatusMap } from "../lib/migration_status_map";
-import { getLocalMigrationDisplayPath } from "../lib/get_local_migration_display_path";
+import { getLocalMigrationDisplayPath } from "../lib/local_migration_paths";
 import Table from 'cli-table';
 
 export async function doStatus(context: Context) {
@@ -19,4 +19,3 @@ export async function doStatus(context: Context) {
   }
   console.log(table.toString());
 }
-

@@ -8,8 +8,9 @@ const ConfigFileNames: string[] = [
 ];
 
 const DefaultConfig: Partial<Config> = {
-  migrationsRelPath: "./migrations/",
+  migrationsRelPath: "./migrations",
   migrationsTableName: "migrations",
+  autoTidyNewMigrations: false,
   defaultMigrationType: 'ts',
 };
 
@@ -36,7 +37,7 @@ export function validateConfig(obj: any): obj is Config {
   return true;
 }
 
-export async function loadConfig(workingDirectory: string): Promise<Config> {
+export async function loadConfig(workingDirectory: string): Promise<Required<Config>> {
   for (const fileName of ConfigFileNames) {
     if (await fileExists(Path.join(workingDirectory, fileName))) {
       return await loadConfigFromPath(Path.join(workingDirectory, fileName));
@@ -45,9 +46,9 @@ export async function loadConfig(workingDirectory: string): Promise<Config> {
   throw new ConfigValidationError(`Could not find migrations.config.ts/.js file at ${Path.join(workingDirectory, ConfigFileNames[0])}`);
 }
 
-async function loadConfigFromPath(path: string): Promise<Config> {
+async function loadConfigFromPath(path: string): Promise<Required<Config>> {
   const imported = await import(path);
-  const asConfig = {...DefaultConfig, ...imported.default};
+  const asConfig: Required<Config> = {...DefaultConfig, ...imported.default};
   if (validateConfig(asConfig)) {
     return asConfig;
   } else {

@@ -1,6 +1,6 @@
 import { Context } from "../context";
 import { isMigrationModule, MigrationModule } from "../migration_module";
-import { getDirectionalMigrationPath, getLocalMigrationDisplayPath } from "./get_local_migration_display_path";
+import { getDirectionalMigrationPath, getLocalMigrationDisplayPath } from "./local_migration_paths";
 import { LocalMigration, LocalScriptMigration, LocalSqlMigration } from "./local_migrations_map";
 import { getClient } from "./pg_client";
 import { withTransaction } from "./with_transaction";

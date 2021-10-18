@@ -6,4 +6,4 @@ export type Context = {
   client?: Client | null,
   hasMigrationLock?: boolean,
   transaction?: boolean,
-} & Config;
+} & Required<Config>;

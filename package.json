@@ -1,10 +1,11 @@
 {
   "name": "pg-migrations",
   "version": "1.4.0",
-  "main": "src/migrations_host.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "license": "MIT",
   "engines": {
-    "node": ">=6"
+    "node": ">=16"
   },
   "author": {
     "name": "Richard Tortora",
@@ -15,8 +16,9 @@
     "pg-migrations-ts": "./src/bin/pg-migrations-ts"
   },
   "scripts": {
-    "release": "./scripts/release.js",
-    "build": "tsc"
+    "build": "tsc",
+    "prepublish": "tsc",
+    "release": "./scripts/release.js"
   },
   "dependencies": {
     "cli-table": "^0.3.6",

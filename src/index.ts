@@ -1,2 +1,2 @@
 export type { Config } from './config';
-export { registerMigration } from './registry';
+export type { MigrationModule } from './migration_module';
