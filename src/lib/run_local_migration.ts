@@ -1,6 +1,6 @@
 import { Context } from "../context";
 import { isMigrationModule, MigrationModule } from "../migration_module";
-import { getDirectionalMigrationPath, getLocalMigrationDisplayPath } from "./local_migration_paths";
+import { getLocalMigrationDirectionalPath, getLocalMigrationDisplayPath } from "./local_migration_paths";
 import { LocalMigration, LocalScriptMigration, LocalSqlMigration } from "./local_migrations_map";
 import { getClient } from "./pg_client";
 import { withTransaction } from "./with_transaction";
@@ -28,7 +28,7 @@ export async function runLocalMigration({
 
     const client = await getClient(context);
     if (migrationModule[direction]) {
-      console.log(`.... ${direction} ${migration.key} ${getDirectionalMigrationPath(context, migration, direction)}`);
+      console.log(`.... ${direction} ${migration.key} ${getLocalMigrationDirectionalPath(context, migration, direction)}`);
       await setMigrationStatusInControlTable({
         context,
         migration,
@@ -36,9 +36,9 @@ export async function runLocalMigration({
       });
       try {
         await migrationModule[direction]!(client);
-        console.log(`DONE ${direction} ${migration.key} ${getDirectionalMigrationPath(context, migration, direction)}`);
+        console.log(`DONE ${direction} ${migration.key} ${getLocalMigrationDirectionalPath(context, migration, direction)}`);
       } catch(error) {
-        console.error(`FAIL ${direction} ${migration.key} ${getDirectionalMigrationPath(context, migration, direction)}`);
+        console.error(`FAIL ${direction} ${migration.key} ${getLocalMigrationDirectionalPath(context, migration, direction)}`);
         throw error;
       }
 

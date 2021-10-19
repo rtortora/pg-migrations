@@ -13,7 +13,7 @@ export type CreateArgs = {
   type?: MigrationType,
 };
 
-export async function doCreate(context: Context, args: CreateArgs = {}) {
+export async function create(context: Context, args: CreateArgs = {}) {
   const key = args.key || generateNewMigrationKey(context);
   const existing = await getLocalMigrationsMap(context);
   if (existing.has(key)) {

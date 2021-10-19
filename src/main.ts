@@ -1,11 +1,12 @@
 import { loadConfig } from './lib/config_loader';
 import { Context } from './context';
 import { getCreatedClients } from './lib/pg_client';
-import { doStatus } from './commands/status';
+import { status } from './commands/status';
 import minimist from 'minimist';
-import { doRun } from './commands/run';
-import { doCreate } from './commands/create';
-import { doInit } from './commands/do_init';
+import { run } from './commands/run';
+import { create } from './commands/create';
+import { init } from './commands/init';
+import { tidy } from './commands/tidy';
 
 async function main() {
   const args = minimist(process.argv.slice(2));
@@ -13,7 +14,7 @@ async function main() {
   const command = args._.shift();
 
   if (command === "init") {
-    await doInit({
+    await init({
       workingDirectory: rootPath,
       configType: args['config-type'],
       migrationRelPath: args['migration-rel-path'],
@@ -26,23 +27,25 @@ async function main() {
     };
 
     if (command === "status") {
-      await doStatus(context);
+      await status(context);
     } else if (command === "up") {
-      await doRun(context, {
+      await run(context, {
         direction: 'up',
         key: args.key,
       });
     } else if (command === "down") {
-      await doRun(context, {
+      await run(context, {
         direction: 'down',
         key: args.key,
       });
     } else if (command === "create") {
-      await doCreate(context, {
+      await create(context, {
         key: args.key,
         name: args.name,
         type: args.type,
       });
+    } else if (command === "tidy") {
+      await tidy(context, {});
     } else {
       throw new Error(`No such command '${command}'`);
     }

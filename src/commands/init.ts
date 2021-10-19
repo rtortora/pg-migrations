@@ -14,7 +14,7 @@ export type InitArgs = {
   configType?: MigrationType,
 };
 
-export async function doInit(args: InitArgs): Promise<void> {
+export async function init(args: InitArgs): Promise<void> {
   args.configType = args.configType || "ts";
   if (!["ts", "js"].includes(args.configType)) {
     throw new Error(`Not implemented config type '${args.configType}'`);

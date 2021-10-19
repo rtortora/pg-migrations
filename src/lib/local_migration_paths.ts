@@ -16,11 +16,22 @@ export function getLocalMigrationDisplayPath(context: Context, localMigration: L
   }
 }
 
-export function getDirectionalMigrationPath(context: Context, localMigration: LocalMigration, direction: RunDirection): string | null {
+export function getLocalMigrationDirectionalPath(context: Context, localMigration: LocalMigration, direction: RunDirection): string | null {
   if (localMigration.type === 'sql') {
     if (direction === 'up') { return localMigration.upPath || null; }
     else { return localMigration.downPath || null; }
   } else {
     return localMigration.path;
+  }
+}
+
+export function getLocalMigrationPaths(localMigration: LocalMigration): string[] {
+  if (localMigration.type === 'sql') {
+    return [
+      localMigration.upPath,
+      localMigration.downPath,
+    ].filter((path)=>(!!path)) as string[];
+  } else {
+    return [localMigration.path];
   }
 }

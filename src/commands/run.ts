@@ -8,7 +8,7 @@ export type RunArgs = {
   key?: string,
 };
 
-export async function doRun(context: Context, { direction, key }: RunArgs): Promise<void> {
+export async function run(context: Context, { direction, key }: RunArgs): Promise<void> {
   await withMigrationLock(context, async ()=>{
     const migrationStatusMap = await getMigrationStatusMap(context);
     if (key && (!migrationStatusMap.has(key) || !migrationStatusMap.get(key!)!.local)) {

@@ -4,7 +4,7 @@ import { getMigrationStatusMap } from "../lib/migration_status_map";
 import { getLocalMigrationDisplayPath } from "../lib/local_migration_paths";
 import Table from 'cli-table';
 
-export async function doStatus(context: Context) {
+export async function status(context: Context) {
   const migrationStatusMap = await getMigrationStatusMap(context);
   const table = new Table({
     head: [ "Key", "Status", "Path" ],
