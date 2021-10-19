@@ -21,10 +21,8 @@ export async function doInit(args: InitArgs): Promise<void> {
   }
 
   const config = await writeStartingConfig(args);
-  console.log(`starting config `, config);
 
   const migrationsPath = Path.join(args.workingDirectory, config.migrationsRelPath!);
-  console.log(`migrations path `, migrationsPath);
   if (!(await fileExists(migrationsPath))) {
     await FS.mkdir(migrationsPath);
     console.log(`Created ${migrationsPath}`);
