@@ -1,3 +1,4 @@
+/*
 const FS = require('async-file');
 const Path = require('path');
 const { CONFIG_FILENAME } = require('../migrations_host');
@@ -9,7 +10,7 @@ module.exports = async function doInit(host) {
   migrationsTableName: "migrations",
   migrationsPath: "./migrations/",
   getConnection: async ()=>{
-    const pg = /* do stuff to get a single pg client to your database */
+    const pg = /* do stuff to get a single pg client to your database * /
     return pg;
   }
 }
@@ -19,3 +20,5 @@ module.exports = async function doInit(host) {
     console.log(`Already configured at ${path}`);
   }
 }
+*/
+

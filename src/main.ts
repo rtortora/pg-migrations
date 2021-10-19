@@ -4,6 +4,7 @@ import { getCreatedClients } from './lib/pg_client';
 import { doStatus } from './commands/do_status';
 import minimist from 'minimist';
 import { doRun } from './commands/do_run';
+import { doCreate } from './commands/do_create';
 
 async function main() {
   const args = minimist(process.argv.slice(2));
@@ -26,6 +27,12 @@ async function main() {
     await doRun(context, {
       direction: 'down',
       key: args.key,
+    });
+  } else if (command === "create") {
+    await doCreate(context, {
+      key: args.key,
+      name: args.name,
+      type: args.type,
     });
   } else {
     throw new Error(`No such command '${command}'`);
