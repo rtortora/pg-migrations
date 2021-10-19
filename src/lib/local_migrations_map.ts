@@ -38,7 +38,7 @@ async function scanFolderForLocalMigrations(scanPath: string): Promise<LocalMigr
       if (keySearch) {
         const key = keySearch[1];
         if (/[_-](up|down)\.sql$/i.test(filename)) {
-          let prop: keyof(LocalSqlMigration) = /-down\.sql$/i.test(filename) ? "downPath" : "upPath";
+          let prop: keyof(LocalSqlMigration) = /[_-]down\.sql$/i.test(filename) ? "downPath" : "upPath";
           if (!scanned.has(key)) {
             scanned.set(key, { type: 'sql', key, [prop]: Path.join(scanPath, filename) });
           } else {

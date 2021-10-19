@@ -12,8 +12,7 @@
     "email": "richard.tortora@gmail.com"
   },
   "bin": {
-    "pg-migrations": "./src/bin/pg-migrations",
-    "pg-migrations-ts": "./src/bin/pg-migrations-ts"
+    "pg-migrations": "./dist/bin/pg-migrations.ts"
   },
   "scripts": {
     "build": "tsc",

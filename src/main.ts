@@ -9,7 +9,9 @@ import { init } from './commands/init';
 import { tidy } from './commands/tidy';
 
 async function main() {
-  const args = minimist(process.argv.slice(2));
+  const args = minimist(process.argv.slice(2), {
+    string: ["key", "name"],
+  });
   const rootPath: string = args.path || process.cwd();
   const command = args._.shift();
 
@@ -26,7 +28,7 @@ async function main() {
       rootPath,
     };
 
-    if (command === "status") {
+    if (command === "status" || !command) {
       await status(context);
     } else if (command === "up") {
       await run(context, {

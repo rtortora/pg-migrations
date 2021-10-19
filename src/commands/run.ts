@@ -11,8 +11,10 @@ export type RunArgs = {
 export async function run(context: Context, { direction, key }: RunArgs): Promise<void> {
   await withMigrationLock(context, async ()=>{
     const migrationStatusMap = await getMigrationStatusMap(context);
-    if (key && (!migrationStatusMap.has(key) || !migrationStatusMap.get(key!)!.local)) {
-      throw new Error(`Cannot run ${direction} ${key ? `on '${key}' ` : ''}because cannot find local file`);
+    if (key && !migrationStatusMap.has(key)) {
+      throw new Error(`Cannot run ${direction} ${key ? `on '${key}' ` : ''}because key does not exist`);
+    } else if (key && !migrationStatusMap.get(key!)!.local) {
+      throw new Error(`Cannot run ${direction} ${key ? `on '${key}' ` : ''}because cannot find local file ${JSON.stringify(migrationStatusMap.get(key), null, 2)}`);
     }
     if (direction === 'up' && !key) {
       let runCount: number = 0;

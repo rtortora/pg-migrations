@@ -4,6 +4,7 @@ import { getLocalMigrationDirectionalPath, getLocalMigrationDisplayPath } from "
 import { LocalMigration, LocalScriptMigration, LocalSqlMigration } from "./local_migrations_map";
 import { getClient } from "./pg_client";
 import { withTransaction } from "./with_transaction";
+import { promises as FS } from 'fs';
 
 export type RunDirection = 'up' | 'down';
 
@@ -73,7 +74,22 @@ async function loadLocalSqlMigration({
 }: {
   localMigration: LocalSqlMigration,
 }): Promise<Migration> {
-  throw new Error(`not implemented`);
+  const [upSql, downSql] = await Promise.all([
+    localMigration.upPath ? FS.readFile(localMigration.upPath).then((buffer)=>(buffer.toString())) : Promise.resolve(null),
+    localMigration.downPath ? FS.readFile(localMigration.downPath).then((buffer)=>(buffer.toString())) : Promise.resolve(null),
+  ]);
+  return {
+    up: async (pg)=>{
+      if (upSql) {
+        await pg.query(upSql);
+      }
+    },
+    down: async (pg)=>{
+      if (downSql) {
+        await pg.query(downSql);
+      }
+    },
+  };
 }
 
 async function setMigrationStatusInControlTable({
