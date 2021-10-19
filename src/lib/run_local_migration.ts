@@ -1,5 +1,5 @@
 import { Context } from "../context";
-import { isMigrationModule, MigrationModule } from "../migration_module";
+import { isMigration, Migration } from "../migration";
 import { getLocalMigrationDirectionalPath, getLocalMigrationDisplayPath } from "./local_migration_paths";
 import { LocalMigration, LocalScriptMigration, LocalSqlMigration } from "./local_migrations_map";
 import { getClient } from "./pg_client";
@@ -10,78 +10,79 @@ export type RunDirection = 'up' | 'down';
 export async function runLocalMigration({
   context,
   direction,
-  migration,
+  localMigration,
   isRunningJustOne,
 }: {
   context: Context,
   direction: RunDirection,
-  migration: LocalMigration,
+  localMigration: LocalMigration,
   isRunningJustOne: boolean,
 }) {
   await withTransaction(context, async ()=>{
-    let migrationModule: MigrationModule;
-    if (migration.type == 'sql') {
-      migrationModule = await loadSqlMigrationModule({ migration });
+    let migration: Migration;
+    if (localMigration.type == 'sql') {
+      migration = await loadLocalSqlMigration({ localMigration });
     } else {
-      migrationModule = await loadScriptMigrationModule({ migration });
+      migration = await loadLocalScriptMigration({ localMigration });
     }
 
     const client = await getClient(context);
-    if (migrationModule[direction]) {
-      console.log(`.... ${direction} ${migration.key} ${getLocalMigrationDirectionalPath(context, migration, direction)}`);
+    if (migration[direction]) {
+      console.log(`.... ${direction} ${localMigration.key} ${getLocalMigrationDirectionalPath(context, localMigration, direction)}`);
       await setMigrationStatusInControlTable({
         context,
-        migration,
+        localMigration,
         status: direction,
       });
       try {
-        await migrationModule[direction]!(client);
-        console.log(`DONE ${direction} ${migration.key} ${getLocalMigrationDirectionalPath(context, migration, direction)}`);
+        await migration[direction]!(client);
+        console.log(`DONE ${direction} ${localMigration.key} ${getLocalMigrationDirectionalPath(context, localMigration, direction)}`);
       } catch(error) {
-        console.error(`FAIL ${direction} ${migration.key} ${getLocalMigrationDirectionalPath(context, migration, direction)}`);
+        console.error(`FAIL ${direction} ${localMigration.key} ${getLocalMigrationDirectionalPath(context, localMigration, direction)}`);
         throw error;
       }
 
     } else {
       if (isRunningJustOne) {
-        throw new Error(`Migration ${migration.key} has no direction ${direction}`);
+        throw new Error(`Migration ${localMigration.key} has no direction ${direction}`);
       }
     }
   });
 }
 
-async function loadScriptMigrationModule({
-  migration,
+async function loadLocalScriptMigration({
+  localMigration,
 }: {
-  migration: LocalScriptMigration,
-}): Promise<MigrationModule> {
-  let imported: any = await import(migration.path);
-  let module: MigrationModule | null = null;
-  if (isMigrationModule(imported)) {
+  localMigration: LocalScriptMigration,
+}): Promise<Migration> {
+  let imported: any = await import(localMigration.path);
+  let module: Migration | null = null;
+  if (isMigration(imported)) {
     // can this ever happen?
-    module = imported as MigrationModule;
-  } else if (imported.default && isMigrationModule(imported.default)) {
-    module = imported.default as MigrationModule;
+    module = imported as Migration;
+  } else if (imported.default && isMigration(imported.default)) {
+    module = imported.default as Migration;
   } else {
-    throw new Error(`Cannot find migration module in script ${migration.path}`);
+    throw new Error(`Cannot find migration module in script ${localMigration.path}`);
   }
   return module;
 }
 
-async function loadSqlMigrationModule({
+async function loadLocalSqlMigration({
+  localMigration,
 }: {
-  migration: LocalSqlMigration,
-}): Promise<MigrationModule> {
+  localMigration: LocalSqlMigration,
+}): Promise<Migration> {
   throw new Error(`not implemented`);
 }
 
 async function setMigrationStatusInControlTable({
   context,
-  migration,
+  localMigration,
   status,
 }: {
   context: Context,
-  migration: LocalMigration,
+  localMigration: LocalMigration,
   status: RunDirection,
 }): Promise<void> {
   const pg = await getClient(context);
@@ -89,14 +90,14 @@ async function setMigrationStatusInControlTable({
     await pg.query(`
       insert into "${context.migrationsTableName}" (key, filename) values ($1, $2)
     `, [
-      migration.key,
-      getLocalMigrationDisplayPath(context, migration),
+      localMigration.key,
+      getLocalMigrationDisplayPath(context, localMigration),
     ]);
   } else if (status === 'down') {
     await pg.query(`
       delete from "${context.migrationsTableName}" where key = $1
     `, [
-      migration.key,
+      localMigration.key,
     ]);
   } else {
     throw new Error(`Unexpected status`);

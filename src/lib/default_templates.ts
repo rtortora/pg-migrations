@@ -3,9 +3,9 @@ import { MigrationType } from "../lib/local_migrations_map";
 export const DefaultTemplateByType: {[type in MigrationType]: string | null} = {
   ts: `// TEMPLATE: This file is the default starting point for newly created migrations.
 // TEMPLATE: Any comment starting with the text 'TEMPLATE:' is not copied.
-import { MigrationModule } from 'pg-migrations';
+import { Migration } from 'pg-migrations';
 
-const migration: MigrationModule = {
+const migration: Migration = {
   up: async (pg)=>{
     await pg.query(\`
     \`);

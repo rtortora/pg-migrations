@@ -18,7 +18,7 @@ export async function run(context: Context, { direction, key }: RunArgs): Promis
       let runCount: number = 0;
       for (const migrationStatus of migrationStatusMap.values()) {
         if (!migrationStatus.applied && migrationStatus.local) {
-          await runLocalMigration({ context, direction: 'up', migration: migrationStatus.local!, isRunningJustOne: false });
+          await runLocalMigration({ context, direction: 'up', localMigration: migrationStatus.local!, isRunningJustOne: false });
           runCount += 1;
         }
       }
@@ -34,12 +34,12 @@ export async function run(context: Context, { direction, key }: RunArgs): Promis
       if (!latestApplied.local) {
         throw new Error(`Cannot run down on ${latestApplied.applied!.key} "${latestApplied.applied!.filename}" because no local file`);
       }
-      await runLocalMigration({ context, direction: 'down', migration: latestApplied.local, isRunningJustOne: true });
+      await runLocalMigration({ context, direction: 'down', localMigration: latestApplied.local, isRunningJustOne: true });
     } else if (key) {
       await runLocalMigration({
         context,
         direction,
-        migration: migrationStatusMap.get(key)!.local!,
+        localMigration: migrationStatusMap.get(key)!.local!,
         isRunningJustOne: true,
       });
     } else {
