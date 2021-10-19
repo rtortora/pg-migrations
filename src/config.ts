@@ -56,24 +56,26 @@ export type Config = {
   /**
    * PG connection settings
    */
-  pg: {
-    database: string,
+  pg: PgConfig,
+};
 
-    user?: string,
+export type PgConfig = {
+  database: string,
 
-    /**
-     * Default value: "localhost"
-     */
-    host?: string,
+  user?: string,
 
-    /**
-     * Password can also be provided with the PGPASSWORD environment variable.
-     */
-    password?: string,
+  /**
+   * Default value: "localhost"
+   */
+  host?: string,
 
-    /**
-     * Default value: 5432
-     */
-    port?: number,
-  },
+  /**
+   * Password can also be provided with the PGPASSWORD environment variable.
+   */
+  password?: string,
+
+  /**
+   * Default value: 5432
+   */
+  port?: number,
 };

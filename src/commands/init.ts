@@ -1,17 +1,21 @@
 import { promises as FS } from 'fs';
 import Path from 'path';
-import { Config } from '../config';
+import { Config, PgConfig } from '../config';
 import { MigrationType } from '../lib/local_migrations_map';
 import { fileExists } from '../util/file_exists';
 import { DefaultTemplateByType } from '../lib/default_templates';
 import { DefaultConfig } from '../lib/config_loader';
 
-type StartingConfig = Partial<Pick<Config, "migrationsRelPath">>;
+type StartingConfig = Partial<Pick<Config, "migrationsRelPath" | "pg" | "creation">>;
+const DefaultLibSrc = "pg-migrations";
 
 export type InitArgs = {
   workingDirectory: string,
   migrationRelPath?: string,
   configType?: MigrationType,
+  silent?: boolean,
+  libSrc?: string,
+  pg?: PgConfig
 };
 
 export async function init(args: InitArgs): Promise<void> {
@@ -25,7 +29,9 @@ export async function init(args: InitArgs): Promise<void> {
   const migrationsPath = Path.join(args.workingDirectory, config.migrationsRelPath!);
   if (!(await fileExists(migrationsPath))) {
     await FS.mkdir(migrationsPath);
-    console.log(`Created ${migrationsPath}`);
+    if (!args.silent) {
+      console.log(`Created ${migrationsPath}`);
+    }
   }
 
   const defaultTemplatePath = Path.join(migrationsPath, `_template.${args.configType}`);
@@ -33,19 +39,25 @@ export async function init(args: InitArgs): Promise<void> {
     throw new Error(`Template file already exists at ${defaultTemplatePath}`);
   }
   await FS.writeFile(defaultTemplatePath, DefaultTemplateByType[args.configType]!);
-  console.log(`Created ${defaultTemplatePath}`);
+  if (!args.silent) {
+    console.log(`Created ${defaultTemplatePath}`);
+  }
 }
 
 async function writeStartingConfig(args: InitArgs): Promise<Config> {
   const startingConfig = getStartingConfig({
     migrationsRelPath: args.migrationRelPath || DefaultConfig.migrationsRelPath,
+    pg: args.pg || { database: "" },
+    creation: {
+      defaultMigrationType: args.configType,
+    },
   });
   const configPath = Path.join(args.workingDirectory, `migrations.config.${args.configType!}`);
   if (await fileExists(configPath)) {
     throw new Error(`Config file already exists at ${configPath}`);
   }
   if (args.configType === 'ts') {
-    await FS.writeFile(configPath, `import { Config } from 'pg-migrations';
+    await FS.writeFile(configPath, `import type { Config } from '${args.libSrc || DefaultLibSrc}';
 
 const config: Config = ${JSON.stringify(startingConfig, null, 2)};
 
@@ -57,7 +69,9 @@ export default config;
   } else {
     throw new Error(`not implemented`);
   }
-  console.log(`Created ${configPath}`);
+  if (!args.silent) {
+    console.log(`Created ${configPath}`);
+  }
 
   return startingConfig;
 }
@@ -66,13 +80,7 @@ function getStartingConfig(configByArgs: StartingConfig): Config {
   const config: Config = {
     migrationsTableName: "migrations",
     migrationsRelPath: "./migrations",
-    pg: {
-      database: "",
-      user: "",
-      password: process.env.PGPASSWORD,
-      host: "localhost",
-      port: 5432,
-    },
+    pg: { database: "" },
     ...configByArgs,
   };
   return config;

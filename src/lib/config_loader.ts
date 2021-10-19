@@ -2,6 +2,8 @@ import Path from 'path';
 import { fileExists } from '../util/file_exists';
 import { Config } from "../config";
 import { EOL } from 'os';
+import { promises as FS } from 'fs';
+import { importCode } from './code_importer';
 
 export type FullConfig = Required<Config> & {
   creation: Required<Config['creation']>
@@ -60,7 +62,7 @@ export async function loadConfig(workingDirectory: string): Promise<FullConfig> 
 }
 
 async function loadConfigFromPath(path: string): Promise<FullConfig> {
-  const imported = await import(path);
+  const imported = await importCode(path);
   const fullConfig: FullConfig = {
     ...DefaultConfig,
     ...imported.default,

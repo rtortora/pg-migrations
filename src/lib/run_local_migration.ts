@@ -5,6 +5,7 @@ import { LocalMigration, LocalScriptMigration, LocalSqlMigration } from "./local
 import { getClient } from "./pg_client";
 import { withTransaction } from "./with_transaction";
 import { promises as FS } from 'fs';
+import { importCode } from "./code_importer";
 
 export type RunDirection = 'up' | 'down';
 
@@ -56,7 +57,7 @@ async function loadLocalScriptMigration({
 }: {
   localMigration: LocalScriptMigration,
 }): Promise<Migration> {
-  let imported: any = await import(localMigration.path);
+  let imported: any = await importCode(localMigration.path);
   let module: Migration | null = null;
   if (isMigration(imported)) {
     // can this ever happen?

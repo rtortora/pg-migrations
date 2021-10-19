@@ -1,5 +1,4 @@
-import { loadConfig } from './lib/config_loader';
-import { Context } from './context';
+import { loadContext } from './lib/context_loader';
 import { getCreatedClients } from './lib/pg_client';
 import { status } from './commands/status';
 import minimist from 'minimist';
@@ -22,11 +21,7 @@ async function main() {
       migrationRelPath: args['migration-rel-path'],
     });
   } else {
-    const config = await loadConfig(rootPath);
-    const context: Context = {
-      ...config,
-      rootPath,
-    };
+    const context = await loadContext(rootPath);
 
     if (command === "status" || !command) {
       await status(context);

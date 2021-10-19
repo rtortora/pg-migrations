@@ -1,5 +1,4 @@
 dist
 node_modules
-migrations
-migrations.config.ts
+test_db_config.ts
 yarn-error.log

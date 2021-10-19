@@ -105,3 +105,13 @@ To run a specific migration up or down, run:
     yarn migrate up/down (datetime)
 
 For any up/down, you can --dryrun to see what files it will run first.
+
+# Development
+
+## One-time test setup
+
+The library needs a postgres database to operate on to run certain tests.
+
+    createuser -l -s pgm
+    createdb pgm_test --owner=pgm
+    cp ./test_db_config.sample.ts ./test_db_config.ts

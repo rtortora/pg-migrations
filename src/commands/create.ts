@@ -11,6 +11,7 @@ export type CreateArgs = {
   key?: string,
   name?: string,
   type?: MigrationType,
+  silent?: boolean,
 };
 
 export async function create(context: Context, args: CreateArgs = {}) {
@@ -26,17 +27,21 @@ export async function create(context: Context, args: CreateArgs = {}) {
       const filePath = getMigrationPath({ context, key, name: args.name, type: args.type, direction });
       const body = await getNewMigrationBody(context, args.type, direction);
       await FS.writeFile(filePath, body || "");
-      console.log(`Created ${filePath}`);
+      if (!args.silent) {
+        console.log(`Created ${filePath}`);
+      }
     }
   } else {
     const filePath = getMigrationPath({ context, key, name: args.name, type: args.type });
     const body = await getNewMigrationBody(context, args.type);
     await FS.writeFile(filePath, body || "");
-    console.log(`Created ${filePath}`);
+    if (!args.silent) {
+      console.log(`Created ${filePath}`);
+    }
   }
 }
 
-function generateNewMigrationKey(context: Context) {
+export function generateNewMigrationKey(context: Context) {
   let dateStr = (new Date()).toISOString();
   const match = dateStr.match(/^(?<year>\d\d\d\d)-(?<month>\d\d)-(?<day>\d\d)T(?<hour>\d\d):(?<minute>\d\d):(?<second>\d\d)\..*$/);
   if (!match) {
