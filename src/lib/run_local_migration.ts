@@ -14,11 +14,13 @@ export async function runLocalMigration({
   direction,
   localMigration,
   isRunningJustOne,
+  silent,
 }: {
   context: Context,
   direction: RunDirection,
   localMigration: LocalMigration,
   isRunningJustOne: boolean,
+  silent?: boolean,
 }) {
   await withTransaction(context, async ()=>{
     let migration: Migration;
@@ -30,7 +32,9 @@ export async function runLocalMigration({
 
     const client = await getClient(context);
     if (migration[direction]) {
-      console.log(`.... ${direction} ${localMigration.key} ${getLocalMigrationDirectionalPath(context, localMigration, direction)}`);
+      if (!silent) {
+        console.log(`.... ${direction} ${localMigration.key} ${getLocalMigrationDirectionalPath(context, localMigration, direction)}`);
+      }
       await setMigrationStatusInControlTable({
         context,
         localMigration,
@@ -38,7 +42,9 @@ export async function runLocalMigration({
       });
       try {
         await migration[direction]!(client);
-        console.log(`DONE ${direction} ${localMigration.key} ${getLocalMigrationDirectionalPath(context, localMigration, direction)}`);
+        if (!silent) {
+          console.log(`DONE ${direction} ${localMigration.key} ${getLocalMigrationDirectionalPath(context, localMigration, direction)}`);
+        }
       } catch(error) {
         console.error(`FAIL ${direction} ${localMigration.key} ${getLocalMigrationDirectionalPath(context, localMigration, direction)}`);
         throw error;

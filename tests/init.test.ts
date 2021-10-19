@@ -3,7 +3,7 @@ import Path from 'path';
 import { init } from '../src/commands/init';
 import { loadConfig } from '../src/lib/config_loader';
 import TestDbConfig from '../test_db_config';
-import { useMockFs } from './use_mock_fs';
+import { useMockFs } from './test_helpers/use_mock_fs';
 
 jest.mock("fs");
 const { workingDirectory } = useMockFs();

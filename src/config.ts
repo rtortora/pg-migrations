@@ -18,6 +18,12 @@ export type Config = {
    */
   creation?: {
     /**
+     * The source providing the pg-migrations library.
+     * Default value: pg-migrations
+     */
+    libSrc?: string,
+
+    /**
      * If true, newly created migrations will automatically be put into a YEAR-MONTH
      * subfolder to keep migrations tidy. Whether or not this setting is true, the
      * pg-migrations tidy command can do this at any time in the future.

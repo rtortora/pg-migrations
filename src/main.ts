@@ -1,5 +1,5 @@
 import { loadContext } from './lib/context_loader';
-import { getCreatedClients } from './lib/pg_client';
+import { closeLingeringClients } from './lib/pg_client';
 import { status } from './commands/status';
 import minimist from 'minimist';
 import { run } from './commands/run';
@@ -48,9 +48,7 @@ async function main() {
     }
   }
 
-  for (const client of getCreatedClients()) {
-    await client.end();
-  }
+  closeLingeringClients();
 }
 
 main();

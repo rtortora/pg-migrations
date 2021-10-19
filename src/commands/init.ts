@@ -7,7 +7,6 @@ import { DefaultTemplateByType } from '../lib/default_templates';
 import { DefaultConfig } from '../lib/config_loader';
 
 type StartingConfig = Partial<Pick<Config, "migrationsRelPath" | "pg" | "creation">>;
-const DefaultLibSrc = "pg-migrations";
 
 export type InitArgs = {
   workingDirectory: string,
@@ -49,6 +48,7 @@ async function writeStartingConfig(args: InitArgs): Promise<Config> {
     migrationsRelPath: args.migrationRelPath || DefaultConfig.migrationsRelPath,
     pg: args.pg || { database: "" },
     creation: {
+      ...(args.libSrc ? { libSrc: args.libSrc } : {}),
       defaultMigrationType: args.configType,
     },
   });
@@ -57,7 +57,7 @@ async function writeStartingConfig(args: InitArgs): Promise<Config> {
     throw new Error(`Config file already exists at ${configPath}`);
   }
   if (args.configType === 'ts') {
-    await FS.writeFile(configPath, `import type { Config } from '${args.libSrc || DefaultLibSrc}';
+    await FS.writeFile(configPath, `import type { Config } from '${args.libSrc || DefaultConfig.creation!.libSrc!}';
 
 const config: Config = ${JSON.stringify(startingConfig, null, 2)};
 

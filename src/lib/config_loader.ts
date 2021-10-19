@@ -18,6 +18,7 @@ export const DefaultConfig: Partial<Config> = {
   migrationsRelPath: "./migrations",
   migrationsTableName: "migrations",
   creation: {
+    libSrc: 'pg-migrations',
     autoTidy: false,
     defaultMigrationType: 'ts',
     fileNameSeperator: '_',

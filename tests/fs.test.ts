@@ -1,5 +1,5 @@
 import { promises as FS } from 'fs';
-import { useMockFs } from './use_mock_fs';
+import { useMockFs } from './test_helpers/use_mock_fs';
 import Path from 'path';
 
 jest.mock("fs");

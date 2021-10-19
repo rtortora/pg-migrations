@@ -7,39 +7,23 @@ import { create, generateNewMigrationKey } from '../src/commands/create';
 import { Context } from '../src/context';
 import { MigrationType } from '../src/lib/local_migrations_map';
 import { EOL } from 'os';
-import { useMockFs } from './use_mock_fs';
+import { useMockFs } from './test_helpers/use_mock_fs';
+import { getStandardSetup } from './test_helpers/get_standard_setup';
 
 jest.mock("fs");
 const { workingDirectory } = useMockFs();
 
-async function getStandardSetup({
-  configType = 'ts',
-}: {
-  configType?: MigrationType,
-}): Promise<{ context: Context }> {
-  await init({
-    workingDirectory,
-    configType,
-    silent: true,
-    libSrc: '../src/',
-    pg: TestDbConfig,
-  });
-  const context = await loadContext(workingDirectory);
-  return { context };
-}
-
 describe('create command', ()=>{
-  for (const migrationType of ['ts'/*, 'js'*/] as MigrationType[]) {
+  for (const migrationType of ['ts', 'js'] as MigrationType[]) {
     test(`can create a migration with ${migrationType} default`, async()=>{
-      const { context } = await getStandardSetup({ configType: migrationType });
+      const { context } = await getStandardSetup({ workingDirectory, configType: migrationType });
       const key = generateNewMigrationKey(context);
       await create(context, { key, name: "test", silent: true });
       await FS.access(Path.join(workingDirectory, "migrations", `${key}_test.${migrationType}`));
     });
 
-
     test(`can create a migration with ${migrationType} default using correct processed template`, async()=>{
-      const { context } = await getStandardSetup({ configType: migrationType });
+      const { context } = await getStandardSetup({ workingDirectory, configType: migrationType });
       await FS.writeFile(Path.join(workingDirectory, "migrations", `_template.${migrationType}`), [
         "// TEMPLATE: this line should be hidden",
         "template text",
@@ -52,7 +36,7 @@ describe('create command', ()=>{
     });
 
     test(`can create a migration with ${migrationType} default with no project template`, async ()=>{
-      const { context } = await getStandardSetup({ configType: migrationType });
+      const { context } = await getStandardSetup({ workingDirectory, configType: migrationType });
       await FS.rm(Path.join(workingDirectory, "migrations", `_template.${migrationType}`));
       const key = generateNewMigrationKey(context);
       await create(context, { key, name: "test", silent: true });

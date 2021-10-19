@@ -4,8 +4,10 @@ import { initMigrationsTable } from './init_migrations_table';
 
 const createdClients: Client[] = [];
 
-export function getCreatedClients(): Client[] {
-  return createdClients;
+export async function closeLingeringClients(): Promise<void> {
+  for (const client of createdClients) {
+    await client.end();
+  }
 }
 
 export async function getClient(context: Context): Promise<Client> {

@@ -6,9 +6,10 @@ import { RunDirection, runLocalMigration } from '../lib/run_local_migration';
 export type RunArgs = {
   direction: RunDirection,
   key?: string,
+  silent?: boolean,
 };
 
-export async function run(context: Context, { direction, key }: RunArgs): Promise<void> {
+export async function run(context: Context, { direction, key, silent }: RunArgs): Promise<void> {
   await withMigrationLock(context, async ()=>{
     const migrationStatusMap = await getMigrationStatusMap(context);
     if (key && !migrationStatusMap.has(key)) {
@@ -20,12 +21,20 @@ export async function run(context: Context, { direction, key }: RunArgs): Promis
       let runCount: number = 0;
       for (const migrationStatus of migrationStatusMap.values()) {
         if (!migrationStatus.applied && migrationStatus.local) {
-          await runLocalMigration({ context, direction: 'up', localMigration: migrationStatus.local!, isRunningJustOne: false });
+          await runLocalMigration({
+            context,
+            direction: 'up',
+            localMigration: migrationStatus.local!,
+            isRunningJustOne: false,
+            silent,
+          });
           runCount += 1;
         }
       }
       if (runCount === 0) {
-        console.log(`All migrations are up.`);
+        if (!silent) {
+          console.log(`All migrations are up.`);
+        }
       }
     } else if (direction === 'down' && !key) {
       const appliedMigrationStatuses = [...migrationStatusMap.values()].filter((migrationStatus)=>(migrationStatus.applied));
@@ -36,13 +45,20 @@ export async function run(context: Context, { direction, key }: RunArgs): Promis
       if (!latestApplied.local) {
         throw new Error(`Cannot run down on ${latestApplied.applied!.key} "${latestApplied.applied!.filename}" because no local file`);
       }
-      await runLocalMigration({ context, direction: 'down', localMigration: latestApplied.local, isRunningJustOne: true });
+      await runLocalMigration({
+        context,
+        direction: 'down',
+        localMigration: latestApplied.local,
+        isRunningJustOne: true,
+        silent,
+      });
     } else if (key) {
       await runLocalMigration({
         context,
         direction,
         localMigration: migrationStatusMap.get(key)!.local!,
         isRunningJustOne: true,
+        silent,
       });
     } else {
       // nothing to do i think?

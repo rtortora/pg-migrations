@@ -14,7 +14,11 @@ export type CreateArgs = {
   silent?: boolean,
 };
 
-export async function create(context: Context, args: CreateArgs = {}) {
+export type CreateResults = {
+  paths: string[]
+};
+
+export async function create(context: Context, args: CreateArgs = {}): Promise<CreateResults> {
   const key = args.key || generateNewMigrationKey(context);
   const existing = await getLocalMigrationsMap(context);
   if (existing.has(key)) {
@@ -23,6 +27,7 @@ export async function create(context: Context, args: CreateArgs = {}) {
 
   args.type = args.type || context.creation.defaultMigrationType;
   if (args.type === "sql") {
+    const filePaths: string[] = [];
     for (const direction of ["up", "down"] as RunDirection[]) {
       const filePath = getMigrationPath({ context, key, name: args.name, type: args.type, direction });
       const body = await getNewMigrationBody(context, args.type, direction);
@@ -30,7 +35,9 @@ export async function create(context: Context, args: CreateArgs = {}) {
       if (!args.silent) {
         console.log(`Created ${filePath}`);
       }
+      filePaths.push(filePath);
     }
+    return { paths: filePaths };
   } else {
     const filePath = getMigrationPath({ context, key, name: args.name, type: args.type });
     const body = await getNewMigrationBody(context, args.type);
@@ -38,6 +45,7 @@ export async function create(context: Context, args: CreateArgs = {}) {
     if (!args.silent) {
       console.log(`Created ${filePath}`);
     }
+    return { paths: [filePath] };
   }
 }
 
