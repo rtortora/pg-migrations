@@ -1,10 +1,10 @@
 import { loadConfig } from './lib/config_loader';
 import { Context } from './context';
 import { getCreatedClients } from './lib/pg_client';
-import { doStatus } from './commands/do_status';
+import { doStatus } from './commands/status';
 import minimist from 'minimist';
-import { doRun } from './commands/do_run';
-import { doCreate } from './commands/do_create';
+import { doRun } from './commands/run';
+import { doCreate } from './commands/create';
 
 async function main() {
   const args = minimist(process.argv.slice(2));
