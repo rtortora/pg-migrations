@@ -12,7 +12,7 @@ const ConfigFileNames: string[] = [
   "migrations.config.js",
 ];
 
-const DefaultConfig: Partial<Config> = {
+export const DefaultConfig: Partial<Config> = {
   migrationsRelPath: "./migrations",
   migrationsTableName: "migrations",
   creation: {
