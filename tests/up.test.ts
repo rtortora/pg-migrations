@@ -5,20 +5,20 @@ import { getStandardSetup } from './test_helpers/get_standard_setup';
 import { run } from '../src/commands/run';
 import { closeLingeringClients, getClient } from '../src/lib/pg_client';
 import { execSync } from 'child_process';
+import { useMockPg } from './test_helpers/use_mock_pg';
+
+//jest.mock("pg");
+//useMockPg();
 
 jest.mock("fs");
 const { workingDirectory } = useMockFs();
 
 describe('up command', ()=>{
-  beforeEach(()=>{
-    execSync("dropdb pgm_test && createdb pgm_test --owner=pgm");
-  });
-
   afterEach(()=>{
     closeLingeringClients();
   });
 
-  for (const migrationType of ['ts'] as MigrationType[]) {
+  for (const migrationType of ['ts', 'ts'] as MigrationType[]) {
     test(`can run up on a migration with ${migrationType}`, async()=>{
       const { context } = await getStandardSetup({ workingDirectory, configType: migrationType });
       await createSimpleMigration({
@@ -32,6 +32,8 @@ describe('up command', ()=>{
       });
       const pg = await getClient(context);
       await pg.query(`insert into salads (name) values ('caesar')`);
+      const results = (await pg.query(`select name from salads`)).rows.map((row)=>(row.name));
+      expect(results).toEqual(["caesar"]);
     });
   }
 });
