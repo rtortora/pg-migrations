@@ -1,28 +1,44 @@
 {
   "name": "pg-migrations",
-  "version": "1.4.0",
-  "main": "src/migrations_host.js",
+  "version": "2.0.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "license": "MIT",
   "engines": {
-    "node": ">=6"
+    "node": ">=16"
   },
   "author": {
     "name": "Richard Tortora",
     "email": "richard.tortora@gmail.com"
   },
   "bin": {
-    "pg-migrations": "./src/bin/pg-migrations",
-    "pg-migrations-ts": "./src/bin/pg-migrations-ts"
+    "pg-migrations": "./dist/bin/pg-migrations.js"
   },
   "scripts": {
+    "dev": "ts-node src/main",
+    "build": "tsc",
+    "prepublish": "tsc",
+    "test": "NODE_ENV=test jest",
     "release": "./scripts/release.js"
   },
   "dependencies": {
-    "async-file": "^2.0.2",
-    "cli-table": "^0.3.1",
-    "minimist": "^1.2.3"
+    "cli-table": "^0.3.6",
+    "ts-command-line-args": "^2.1.0",
+    "typescript": "^4.4.4"
   },
   "peerDependencies": {
-    "pg": "^7.x"
+    "pg": "^8.7.1"
+  },
+  "devDependencies": {
+    "@types/cli-table": "^0.3.0",
+    "@types/jest": "^27.0.2",
+    "@types/node": "^16.11.1",
+    "@types/pg": "^8.6.1",
+    "jest": "^27.3.0",
+    "memfs": "^3.3.0",
+    "pg": "^8.7.1",
+    "pg-mem": "^2.1.6",
+    "ts-jest": "^27.0.7",
+    "ts-node": "^10.3.0"
   }
 }
