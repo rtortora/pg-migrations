@@ -8,7 +8,7 @@ import { RunDirection } from '../lib/run_local_migration';
 import { removeLines } from '../util/remove_lines';
 import { ensureTidyPathForMigrationKey } from './tidy';
 
-export type CreateArgs = {
+export interface ICreateCommandArgs {
   key?: string,
   name?: string,
   type?: MigrationType,
@@ -19,7 +19,7 @@ export type CreateResults = {
   paths: string[]
 };
 
-export async function create(context: Context, args: CreateArgs = {}): Promise<CreateResults> {
+export async function create(context: Context, args: ICreateCommandArgs = {}): Promise<CreateResults> {
   const key = args.key || generateNewMigrationKey(context);
   const existing = await getLocalMigrationsMap(context);
   if (existing.has(key)) {

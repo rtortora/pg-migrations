@@ -10,7 +10,7 @@ export async function status(context: Context, {
 } = {}): Promise<Table> {
   const migrationStatusMap = await getMigrationStatusMap(context);
   const table = new Table({
-    head: [ "Key", "Status", "Path" ],
+    head: [ "Key", "Status", "Local Path" ],
   });
   for(const key of migrationStatusMap.keys()) {
     const status = migrationStatusMap.get(key)!;

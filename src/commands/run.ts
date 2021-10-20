@@ -3,11 +3,14 @@ import { getMigrationStatusMap } from "../lib/migration_status_map";
 import { withMigrationLock } from "../lib/with_migration_lock";
 import { RunDirection, runLocalMigration } from '../lib/run_local_migration';
 
-export type RunArgs = {
-  direction: RunDirection,
+export interface IRunCommandArgs {
   key?: string,
   silent?: boolean,
 };
+
+type RunArgs = {
+  direction: RunDirection,
+} & IRunCommandArgs;
 
 export async function run(context: Context, { direction, key, silent }: RunArgs): Promise<void> {
   await withMigrationLock(context, async ()=>{

@@ -8,11 +8,14 @@ import { DefaultConfig } from '../lib/config_loader';
 
 type StartingConfig = Partial<Pick<Config, "migrationsRelPath" | "pg" | "creation">>;
 
-export type InitArgs = {
-  workingDirectory: string,
+export interface IInitCommandArgs {
   migrationRelPath?: string,
   configType?: MigrationType,
   silent?: boolean,
+};
+
+type InitArgs = IInitCommandArgs & {
+  workingDirectory: string,
   libSrc?: string,
   pg?: PgConfig
   creation?: CreationConfig,
