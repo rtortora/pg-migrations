@@ -1,6 +1,6 @@
-const { newDb, DataType } = require('pg-mem');
+import { newDb, DataType } from 'pg-mem';
 
-function createNewDbClientClass() {
+function createNewDbClientClass(): any {
   const db = newDb();
   db.public.registerFunction({
     name: 'timezone',
@@ -25,17 +25,20 @@ function createNewDbClientClass() {
 }
 
 class ClientWrapper {
-  constructor(...args) {
+  private clientConstructorArgs: any;
+  private client: any;
+
+  constructor(...args: any) {
     this.clientConstructorArgs = args;
   }
 
-  connect(...args) {
+  connect(...args: any) {
     const Client = createNewDbClientClass();
     this.client = new Client(...this.clientConstructorArgs);
     return this.client.connect(...args);
   }
 
-  query(...args) {
+  query(...args: any) {
     return this.client.query(...args);
   }
 
