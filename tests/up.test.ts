@@ -7,8 +7,8 @@ import { closeLingeringClients, getClient } from '../src/lib/pg_client';
 import { execSync } from 'child_process';
 import { useMockPg } from './test_helpers/use_mock_pg';
 
-//jest.mock("pg");
-//useMockPg();
+jest.mock("pg");
+useMockPg();
 
 jest.mock("fs");
 const { workingDirectory } = useMockFs();
@@ -18,7 +18,7 @@ describe('up command', ()=>{
     closeLingeringClients();
   });
 
-  for (const migrationType of ['ts', 'ts'] as MigrationType[]) {
+  for (const migrationType of ['ts', 'ts', 'ts'] as MigrationType[]) {
     test(`can run up on a migration with ${migrationType}`, async()=>{
       const { context } = await getStandardSetup({ workingDirectory, configType: migrationType });
       await createSimpleMigration({
