@@ -1,6 +1,13 @@
 import { vol, DirectoryJSON } from 'memfs';
 
 export function useMockFs(): { workingDirectory: string }{
+  beforeAll(async ()=>{
+    // This is probably silly, but the first time we import this, it's
+    // pretty slow, and I don't want it to show up on any timings of
+    // any specific test.
+    await import("typescript");
+  });
+
   beforeEach(async ()=>{
     try {
       vol.reset();
