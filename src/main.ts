@@ -6,6 +6,7 @@ import { run } from './commands/run';
 import { create } from './commands/create';
 import { init } from './commands/init';
 import { tidy } from './commands/tidy';
+import { help } from './commands/help';
 
 async function main() {
   const args = minimist(process.argv.slice(2), {
@@ -23,26 +24,28 @@ async function main() {
   } else {
     const context = await loadContext(rootPath);
 
-    if (command === "status" || !command) {
+    if (!command || /^statu?s$/i.test(command)) {
       await status(context);
-    } else if (command === "up") {
+    } else if (/^up$/.test(command)) {
       await run(context, {
         direction: 'up',
         key: args.key,
       });
-    } else if (command === "down") {
+    } else if (/^down$/i.test(command)) {
       await run(context, {
         direction: 'down',
         key: args.key,
       });
-    } else if (command === "create") {
+    } else if (/^create$/i.test(command)) {
       await create(context, {
         key: args.key,
         name: args.name,
         type: args.type,
       });
-    } else if (command === "tidy") {
+    } else if (/^tidy$/i.test(command)) {
       await tidy(context, {});
+    } else if (/^help$/i.test(command)) {
+      await help();
     } else {
       throw new Error(`No such command '${command}'`);
     }

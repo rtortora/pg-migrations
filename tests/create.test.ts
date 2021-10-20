@@ -61,5 +61,14 @@ describe('create command', ()=>{
       await create(context, { key, name: "test", silent: true });
       await FS.access(Path.join(workingDirectory, "migrations", `${year}${context.creation.fileNameSeperator}${month.toString().padStart(2, "0")}`, `${key}_test.${migrationType}`));
     });
+
+    test(`can create a migration with a type other than ${migrationType} in a ${migrationType} project`, async ()=>{
+      const swap: {[key in MigrationType]?: MigrationType} = { ts: 'js', js: 'ts' };
+      const swapped = swap[migrationType]!;
+      const { context } = await getStandardSetup({ workingDirectory, configType: migrationType });
+      const key = generateNewMigrationKey(context);
+      await create(context, { key, name: "test", type: swapped, silent: true });
+      await FS.access(Path.join(workingDirectory, "migrations", `${key}_test.${swapped}`));
+    });
   }
 });
