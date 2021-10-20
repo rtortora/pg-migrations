@@ -18,18 +18,17 @@ if [[ $(git status --porcelain | wc -l) -ne 0 ]]; then
   exit 1
 fi
 
+git checkout master && git pull
+
+# Thanks to set -e, this should bail if any tests fail.
 yarn test
-if [[ $? -ne 0 ]]; then
-  echo "Test suite not passing, fix before releasing."
-  exit 1
-fi
 
-exit 0
-
-git checkout master && \
+git checkout stable && \
   git pull && \
-  git checkout stable && \
   git merge master && \
   git push && \
   git tag -a v${version} -m 'v${version}' && \
+  git push origin v${version} && \
   git checkout master
+
+echo "Done, created tag v${version}"

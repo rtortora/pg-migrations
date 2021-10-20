@@ -76,5 +76,3 @@ To run a specific migration up or down, run:
 
 For any up/down, you can --dryrun to see what files it will run first.
 
-# Development
-
