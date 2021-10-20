@@ -15,6 +15,7 @@
     "pg-migrations": "./dist/bin/pg-migrations.js"
   },
   "scripts": {
+    "dev": "ts-node src/main",
     "build": "tsc",
     "prepublish": "tsc",
     "test": "NODE_ENV=test jest",
