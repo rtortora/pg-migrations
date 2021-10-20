@@ -17,7 +17,7 @@
   "scripts": {
     "dev": "ts-node src/main",
     "build": "tsc",
-    "prepublish": "tsc",
+    "prepare": "tsc",
     "test": "NODE_ENV=test jest"
   },
   "dependencies": {
