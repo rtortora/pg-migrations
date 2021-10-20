@@ -1,10 +1,13 @@
 import { Context } from "../context";
-import { LocalMigration } from "../lib/local_migrations_map";
 import { getMigrationStatusMap } from "../lib/migration_status_map";
 import { getLocalMigrationDisplayPath } from "../lib/local_migration_paths";
 import Table from 'cli-table';
 
-export async function status(context: Context) {
+export async function status(context: Context, {
+  silent = false,
+}: {
+  silent?: boolean,
+} = {}): Promise<Table> {
   const migrationStatusMap = await getMigrationStatusMap(context);
   const table = new Table({
     head: [ "Key", "Status", "Path" ],
@@ -17,5 +20,8 @@ export async function status(context: Context) {
       status.local ? getLocalMigrationDisplayPath(context, status.local) : `MISSING: ${status.applied?.filename}`,
     ]);
   }
-  console.log(table.toString());
+  if (!silent) {
+    console.log(table.toString());
+  }
+  return table;
 }

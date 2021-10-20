@@ -4,7 +4,6 @@ import { createSimpleMigration } from './test_helpers/create_simple_migration';
 import { getStandardSetup } from './test_helpers/get_standard_setup';
 import { run } from '../src/commands/run';
 import { closeLingeringClients, getClient } from '../src/lib/pg_client';
-import { execSync } from 'child_process';
 import { useMockPg } from './test_helpers/use_mock_pg';
 
 jest.mock("pg");
@@ -18,18 +17,14 @@ describe('up command', ()=>{
     closeLingeringClients();
   });
 
-  for (const migrationType of ['ts', 'ts', 'ts'] as MigrationType[]) {
+  for (const migrationType of ['ts', 'js', 'sql'] as MigrationType[]) {
     test(`can run up on a migration with ${migrationType}`, async()=>{
-      const { context } = await getStandardSetup({ workingDirectory, configType: migrationType });
-      await createSimpleMigration({
-        context,
-        migrationType,
+      const configType = migrationType === 'sql' ? 'ts' : migrationType;
+      const { context } = await getStandardSetup({ workingDirectory, configType });
+      await createSimpleMigration({ context, migrationType,
         upSql: "create table salads (id serial primary key not null, name text not null);",
       });
-      await run(context, {
-        direction: 'up',
-        silent: true,
-      });
+      await run(context, { direction: 'up', silent: true });
       const pg = await getClient(context);
       await pg.query(`insert into salads (name) values ('caesar')`);
       const results = (await pg.query(`select name from salads`)).rows.map((row)=>(row.name));

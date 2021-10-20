@@ -6,7 +6,7 @@ function createNewDbClientClass(): any {
     name: 'timezone',
     args: [DataType.text, DataType.date],
     returns: DataType.date,
-    implementation: (x)=>(x),
+    implementation: (_tz, date)=>(date),
   });
   db.public.registerFunction({
     name: 'pg_advisory_lock',
