@@ -17,16 +17,11 @@ export async function tidy(context: Context, { silent }: TidyArgs = {}) {
       continue;
     }
     for (const path of getLocalMigrationPaths(localMigration)) {
-      const { year, month } = match.groups as {[key: string]: string};
-      const tidyPath = `${year}${context.creation.fileNameSeperator}${month}`;
-      if (!(await fileExists(Path.join(context.rootPath, context.migrationsRelPath, tidyPath)))) {
-        if (!silent) {
-          console.log(`Created ${Path.join(context.rootPath, context.migrationsRelPath, tidyPath)}`);
-        }
-        await FS.mkdir(Path.join(context.rootPath, context.migrationsRelPath, tidyPath));
+      const tidyPath = await ensureTidyPathForMigrationKey(context, localMigration.key);
+      if (!tidyPath) {
+        continue;
       }
-
-      const moveTo = Path.join(context.rootPath, context.migrationsRelPath, tidyPath, Path.basename(path));
+      const moveTo = Path.join(tidyPath, Path.basename(path));
       if (!silent) {
         console.log(`Moved ${moveTo}`);
       }
@@ -36,4 +31,26 @@ export async function tidy(context: Context, { silent }: TidyArgs = {}) {
       );
     }
   }
+}
+
+export function getTidyRelPath(context: Context, key: string): string | null {
+  const match = key.match(/^(?<year>\d\d\d\d)(?<month>\d\d)/i);
+  if (!match) {
+    return null;
+  }
+  const { year, month } = match.groups as {[key: string]: string};
+  const tidyPath = `${year}${context.creation.fileNameSeperator}${month}`;
+  return tidyPath;
+}
+
+export async function ensureTidyPathForMigrationKey(context: Context, key: string): Promise<string | null> {
+  const tidyRelPath = getTidyRelPath(context, key);
+  if (!tidyRelPath) {
+    return null;
+  }
+  const path = Path.join(context.rootPath, context.migrationsRelPath, tidyRelPath);
+  if (!(await fileExists(path))) {
+    await FS.mkdir(path);
+  }
+  return path;
 }

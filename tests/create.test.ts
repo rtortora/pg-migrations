@@ -45,5 +45,21 @@ describe('create command', ()=>{
       const content = (await FS.readFile(Path.join(workingDirectory, "migrations", `${key}_test.${migrationType}`))).toString();
       expect(content).not.toBe("");
     });
+
+    test(`can create a migration with ${migrationType} and autotidy on`, async ()=>{
+      const { context } = await getStandardSetup({
+        workingDirectory,
+        configType: migrationType,
+        creation: {
+          autoTidy: true,
+        },
+      });
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = (now.getMonth() + 1);
+      const key = generateNewMigrationKey(context, now);
+      await create(context, { key, name: "test", silent: true });
+      await FS.access(Path.join(workingDirectory, "migrations", `${year}${context.creation.fileNameSeperator}${month.toString().padStart(2, "0")}`, `${key}_test.${migrationType}`));
+    });
   }
 });

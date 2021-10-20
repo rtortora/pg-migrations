@@ -6,6 +6,7 @@ import { Context } from '../context';
 import { DefaultTemplateByType } from '../lib/default_templates';
 import { RunDirection } from '../lib/run_local_migration';
 import { removeLines } from '../util/remove_lines';
+import { ensureTidyPathForMigrationKey } from './tidy';
 
 export type CreateArgs = {
   key?: string,
@@ -29,7 +30,7 @@ export async function create(context: Context, args: CreateArgs = {}): Promise<C
   if (args.type === "sql") {
     const filePaths: string[] = [];
     for (const direction of ["up", "down"] as RunDirection[]) {
-      const filePath = getMigrationPath({ context, key, name: args.name, type: args.type, direction });
+      const filePath = await getMigrationPath({ context, key, name: args.name, type: args.type, direction });
       const body = await getNewMigrationBody(context, args.type, direction);
       await FS.writeFile(filePath, body || "");
       if (!args.silent) {
@@ -39,7 +40,7 @@ export async function create(context: Context, args: CreateArgs = {}): Promise<C
     }
     return { paths: filePaths };
   } else {
-    const filePath = getMigrationPath({ context, key, name: args.name, type: args.type });
+    const filePath = await getMigrationPath({ context, key, name: args.name, type: args.type });
     const body = await getNewMigrationBody(context, args.type);
     await FS.writeFile(filePath, body || "");
     if (!args.silent) {
@@ -49,8 +50,8 @@ export async function create(context: Context, args: CreateArgs = {}): Promise<C
   }
 }
 
-export function generateNewMigrationKey(context: Context) {
-  let dateStr = (new Date()).toISOString();
+export function generateNewMigrationKey(context: Context, now?: Date) {
+  let dateStr = (now || (new Date())).toISOString();
   const match = dateStr.match(/^(?<year>\d\d\d\d)-(?<month>\d\d)-(?<day>\d\d)T(?<hour>\d\d):(?<minute>\d\d):(?<second>\d\d)\..*$/);
   if (!match) {
     throw new Error(`Could not parse ISO date string for key generation: '${dateStr}'`);
@@ -70,7 +71,7 @@ export function generateNewMigrationKey(context: Context) {
   }
 }
 
-function getMigrationPath({
+async function getMigrationPath({
   context,
   key,
   name,
@@ -82,10 +83,17 @@ function getMigrationPath({
   name?: string,
   type: MigrationType,
   direction?: RunDirection,
-}): string {
+}): Promise<string> {
   const fileName = [key, name, direction].filter((part)=>(!!part)).join(context.creation.fileNameSeperator) + `.${type}`;
-  const filePath = Path.join(context.rootPath, context.migrationsRelPath, fileName);
-  return filePath;
+  if (context.creation.autoTidy) {
+    const tidyPath = await ensureTidyPathForMigrationKey(context, key);
+    if (!tidyPath) {
+      throw new Error(`Could not resolve tidy path`);
+    }
+    return Path.join(tidyPath, fileName);
+  } else {
+    return Path.join(context.rootPath, context.migrationsRelPath, fileName);
+  }
 }
 
 async function getNewMigrationBody(context: Context, type: MigrationType, direction?: RunDirection): Promise<string | null> {

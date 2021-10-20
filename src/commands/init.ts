@@ -1,6 +1,6 @@
 import { promises as FS } from 'fs';
 import Path from 'path';
-import { Config, PgConfig } from '../config';
+import { Config, CreationConfig, PgConfig } from '../config';
 import { MigrationType } from '../lib/local_migrations_map';
 import { fileExists } from '../util/file_exists';
 import { DefaultTemplateByType } from '../lib/default_templates';
@@ -15,6 +15,7 @@ export type InitArgs = {
   silent?: boolean,
   libSrc?: string,
   pg?: PgConfig
+  creation?: CreationConfig,
 };
 
 export async function init(args: InitArgs): Promise<void> {
@@ -48,8 +49,9 @@ async function writeStartingConfig(args: InitArgs): Promise<Config> {
     migrationsRelPath: args.migrationRelPath || DefaultConfig.migrationsRelPath,
     pg: args.pg || { database: "" },
     creation: {
-      ...(args.libSrc ? { libSrc: args.libSrc } : {}),
       defaultMigrationType: args.configType,
+      ...args.creation,
+      ...(args.libSrc ? { libSrc: args.libSrc } : {}),
     },
   });
   const configPath = Path.join(args.workingDirectory, `migrations.config.${args.configType!}`);
