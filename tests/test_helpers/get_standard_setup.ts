@@ -3,7 +3,7 @@ import { CreationConfig } from "../../src/config";
 import { Context } from "../../src/context";
 import { loadContext } from "../../src/lib/context_loader";
 import { MigrationType } from "../../src/lib/local_migrations_map";
-import TestDbConfig from '../../test_db_config';
+import { DummyPgConfig } from './dummy_pg_config';
 
 export async function getStandardSetup({
   workingDirectory,
@@ -19,7 +19,7 @@ export async function getStandardSetup({
     configType,
     silent: true,
     libSrc: '../src/',
-    pg: TestDbConfig,
+    pg: DummyPgConfig,
     creation,
   });
   const context = await loadContext(workingDirectory);

@@ -1,4 +1,3 @@
 dist
 node_modules
-test_db_config.ts
 yarn-error.log

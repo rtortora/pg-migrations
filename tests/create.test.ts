@@ -1,10 +1,6 @@
 import { promises as FS } from 'fs';
 import Path from 'path';
-import TestDbConfig from '../test_db_config';
-import { init } from '../src/commands/init';
-import { loadContext } from '../src/lib/context_loader';
 import { create, generateNewMigrationKey } from '../src/commands/create';
-import { Context } from '../src/context';
 import { MigrationType } from '../src/lib/local_migrations_map';
 import { EOL } from 'os';
 import { useMockFs } from './test_helpers/use_mock_fs';

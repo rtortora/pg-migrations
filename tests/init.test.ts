@@ -2,7 +2,7 @@ import { promises as FS } from 'fs';
 import Path from 'path';
 import { init } from '../src/commands/init';
 import { loadConfig } from '../src/lib/config_loader';
-import TestDbConfig from '../test_db_config';
+import { DummyPgConfig } from './test_helpers/dummy_pg_config';
 import { useMockFs } from './test_helpers/use_mock_fs';
 
 jest.mock("fs");
@@ -15,7 +15,7 @@ describe('init command', ()=>{
       configType: 'ts',
       silent: true,
       libSrc: '../src/',
-      pg: TestDbConfig,
+      pg: DummyPgConfig,
     });
     await FS.access(Path.join(workingDirectory, "migrations.config.ts"));
     await FS.access(Path.join(workingDirectory, "migrations"));
@@ -32,7 +32,7 @@ describe('init command', ()=>{
       configType: 'js',
       silent: true,
       libSrc: '../src/',
-      pg: TestDbConfig,
+      pg: DummyPgConfig,
     });
     await FS.access(Path.join(workingDirectory, "migrations.config.js"));
     await FS.access(Path.join(workingDirectory, "migrations"));
