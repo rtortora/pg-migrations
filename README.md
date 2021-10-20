@@ -1,16 +1,14 @@
 # pg-migrations
 
-A method of managing migrations for postgresql with some novel features.
+A simple postgresql migration management tool.
 
-Features, novel and otherwise:
+Features:
 
-* Migrations can be written in TypeScript, Javascript, or SQL. SQL migrations allow you to benefit from proper SQL color highlighting in your favorite editor.
+* Migrations can be written in TypeScript, Javascript, or raw SQL. SQL migrations allow you to benefit from proper SQL color highlighting in your favorite editor.
 * Migrations can be arbitarily nested into subfolders, and pg-migrations has a 'tidy' tool that will automatically group migrations by year and month and an option to automatically tidy newly created migrations.
 * Easily controlled template for new migrations.
 * Advisory locks are used to ensure that multiple instances of your app won't run the same migrations at the same time (for multi-server deployments).
 * All migrations are run in a transaction. If any fail, it rolls the transaction back, and stops what it's doing.
-
-Nota Bene: You should probably just use [node-pg-migrate](https://github.com/salsita/node-pg-migrate) instead.
 
 ## Installation
 
