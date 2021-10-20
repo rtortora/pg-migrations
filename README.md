@@ -1,22 +1,20 @@
 # pg-migrations
 
-Are you using node-postgres and find [node-pg-migrate](https://github.com/salsita/node-pg-migrate) too much of a whole thing? Then maybe this is for you!
+A method of managing migrations for postgresql with some novel features.
+
+Features, novel and otherwise:
+
+* Migrations can be written in TypeScript, Javascript, or SQL. SQL migrations allow you to benefit from proper SQL color highlighting in your favorite editor.
+* Migrations can be arbitarily nested into subfolders, and pg-migrations has a 'tidy' tool that will automatically group migrations by year and month and an option to automatically tidy newly created migrations.
+* Easily controlled template for new migrations.
+* Advisory locks are used to ensure that multiple instances of your app won't run the same migrations at the same time (for multi-server deployments).
+* All migrations are run in a transaction. If any fail, it rolls the transaction back, and stops what it's doing.
 
 Nota Bene: You should probably just use [node-pg-migrate](https://github.com/salsita/node-pg-migrate) instead.
 
-## Features
-
-* Migrations can be written in TypeScript, Javascript, or SQL. SQL migrations allow you to benefit from proper SQL color highlighting in your favorite editor.
-* All migrations are run in a transaction. If any fail, it rolls the transaction back, and stops what it's doing.
-* Advisory locks are used to ensure that multiple instances of your app won't run the same migrations at the same time (for multi-server deployments).
-* Migrations can be arbitarily deep, and pg-migrations has a 'tidy' tool that will automatically group migrations by year and month.
-* Easily controlled template for new migrations.
-
 ## Installation
 
-For these installation steps, I'm assuming you're using yarn and ES2015+ with async/await and import/export.
-
-First install the library:
+Install the library:
 
     yarn add git+ssh://git@github.com/rtortora/pg-migrations#stable
 
@@ -30,49 +28,15 @@ Then add this to the commands in your `package.json`:
 }
 ```
 
-If you are using typescript, make sure you have ts-node in your development dependencies, then instead add this to your commands in your `package.json`:
-
-```json
-{
-  "scripts": {
-    "migrate": "node_modules/.bin/pg-migrations-ts"
-  }
-}
-```
-
-Then run `yarn migrate init` to create a skeleton config file which looks like so:
-
-```js
-module.exports = {
-  migrationsTableName: "migrations",
-  migrationsPath: "./migrations/",
-  getConnection: async ()=>{
-    const pg = /* do stuff to get a single pg client to your database */
-    return pg;
-  }
-}
-```
-
-Lastly, provide an implementation for the `getConnection` function. You can import any parts of your app to do so!
+Then run `yarn migrate init` to create a skeleton config file and migrations folder. Edit the resulting migrations.config.ts/js to include your postgresql connection information.
 
 ## Adding migrations
 
 Run this:
 
-    yarn migrate create
+    yarn migrate create --name some_name
 
-Which will create a blank migration at ./migrations/(datetime).js, looking something like this:
-
-```js
-module.exports = {
-  up: async (pg)=>{
-    // do whatever
-  },
-  down: async (pg)=>{
-    // do whatever
-  },
-};
-```
+Which will create a blank migration at ./migrations/(datetime)_some_name.js.
 
 Note that any string can follow after the datetime, so you are free to name your files anything. If you want to add a postfix in the create command, you can do `yarn migrate create postfix-here` or `yarn migrate create --name postfix-here`.
 
