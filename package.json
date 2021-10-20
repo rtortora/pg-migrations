@@ -17,7 +17,7 @@
   "scripts": {
     "build": "tsc",
     "prepublish": "tsc",
-    "test": "NODE_ENV=test jest --maxWorkers=1",
+    "test": "NODE_ENV=test jest",
     "release": "./scripts/release.js"
   },
   "dependencies": {

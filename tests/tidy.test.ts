@@ -4,14 +4,11 @@ import { createSimpleMigration } from './test_helpers/create_simple_migration';
 import { getStandardSetup } from './test_helpers/get_standard_setup';
 import { run } from '../src/commands/run';
 import { closeLingeringClients, getClient } from '../src/lib/pg_client';
-import { useMockPg } from './test_helpers/use_mock_pg';
 import { getMigrationStatusMap } from '../src/lib/migration_status_map';
 import { tidy } from '../src/commands/tidy';
 import Path from 'path';
 
 jest.mock("pg");
-useMockPg();
-
 jest.mock("fs");
 const { workingDirectory } = useMockFs();
 
