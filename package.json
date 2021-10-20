@@ -18,8 +18,7 @@
     "dev": "ts-node src/main",
     "build": "tsc",
     "prepublish": "tsc",
-    "test": "NODE_ENV=test jest",
-    "release": "./scripts/release.js"
+    "test": "NODE_ENV=test jest"
   },
   "dependencies": {
     "cli-table": "^0.3.6",
