@@ -1,6 +1,6 @@
 # pg-migrations
 
-A simple postgresql migration management tool.
+A simple postgresql migration management tool for PostgreSQL with a focus on providing low-friction raw SQL migration file management.
 
 Features:
 
@@ -9,6 +9,14 @@ Features:
 * Easily controlled template for new migrations.
 * Advisory locks are used to ensure that multiple instances of your app won't run the same migrations at the same time (for multi-server deployments).
 * All migrations are run in a transaction. If any fail, it rolls the transaction back, and stops what it's doing.
+
+Motivations:
+
+A little bit on why this library exists, not relevant to understanding how to use it.
+
+* While many migration tools allow for raw SQL, the vast majority have their own API and raw SQL is an afterthought. This tool provides low-friction raw SQL access using the pg gem directly, and even allows literal .sql files to serve as migrations. This allows you to write migrations without having to learn and later remember some tool-specific API.
+* When a project gets old, the migrations folder tends to get out of control with too many files. This tool allows you to move local migration files without incurring them to re-run, as long as the filename itself remains unchanged. This tool also provides a `tidy` command to automatically organize your migrations, and an `autoTidy` project configuration option.
+* Some migration tools don't have an automatic mechanism to prevent multiple migration attempts from running at the same time, and some don't run in a transaction, which can make production deployment scary. This tool uses pg_advisory_lock by default to ensure only one 'up/down' can run at a time, and always puts migrations in a transaction.
 
 ## Installation
 
