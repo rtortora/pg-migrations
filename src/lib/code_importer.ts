@@ -5,6 +5,7 @@ import { fileExists } from '../util/file_exists';
 import glob from 'glob';
 
 // Typescript is just not working right now
+// https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API#a-simple-transform-function
 
 export async function importCode<T = any>(pathToSrc: string): Promise<T> {
   if (process.env.NODE_ENV === 'test') {
