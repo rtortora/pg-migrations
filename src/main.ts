@@ -36,7 +36,7 @@ async function main() {
 
   if (command === "init") {
     const initArgs = parse<IInitCommandArgs>({
-      configType: { type: MigrationTypeArgType, optional: true },
+      //configType: { type: MigrationTypeArgType, optional: true },
       migrationRelPath: { type: String, optional: true },
       silent: { type: Boolean, optional: true },
     }, { argv });
@@ -44,8 +44,6 @@ async function main() {
       workingDirectory: rootPath,
       ...initArgs,
     });
-  } else if (command === "test") {
-    console.log(await importCode("/Users/rtortora/dmb/api/migrations.config.ts"));
   } else {
     const context = await loadContext(rootPath);
 
