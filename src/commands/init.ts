@@ -10,7 +10,6 @@ type StartingConfig = Partial<Pick<Config, "migrationsRelPath" | "pg" | "creatio
 
 export interface IInitCommandArgs {
   migrationRelPath?: string,
-  configType?: MigrationType,
   silent?: boolean,
 };
 
@@ -22,11 +21,6 @@ type InitArgs = IInitCommandArgs & {
 };
 
 export async function init(args: InitArgs): Promise<void> {
-  args.configType = args.configType || "ts";
-  if (!["ts", "js"].includes(args.configType)) {
-    throw new Error(`Not implemented config type '${args.configType}'`);
-  }
-
   const config = await writeStartingConfig(args);
 
   const migrationsPath = Path.join(args.workingDirectory, config.migrationsRelPath!);
@@ -37,43 +31,35 @@ export async function init(args: InitArgs): Promise<void> {
     }
   }
 
-  const defaultTemplatePath = Path.join(migrationsPath, `_template.${args.configType}`);
+  const defaultMigrationType = (args.creation ? args.creation.defaultMigrationType : null) || "js";
+
+  const defaultTemplatePath = Path.join(migrationsPath, `_template.${defaultMigrationType}`);
   if (await fileExists(defaultTemplatePath)) {
     throw new Error(`Template file already exists at ${defaultTemplatePath}`);
   }
-  await FS.writeFile(defaultTemplatePath, DefaultTemplateByType[args.configType]!);
+  await FS.writeFile(defaultTemplatePath, DefaultTemplateByType[defaultMigrationType]!);
   if (!args.silent) {
     console.log(`Created ${defaultTemplatePath}`);
   }
 }
 
 async function writeStartingConfig(args: InitArgs): Promise<Config> {
+  const defaultMigrationType = (args.creation ? args.creation.defaultMigrationType : null) || "js";
   const startingConfig = getStartingConfig({
     migrationsRelPath: args.migrationRelPath || DefaultConfig.migrationsRelPath,
     pg: args.pg || { database: "" },
     creation: {
-      defaultMigrationType: args.configType,
+      defaultMigrationType,
       ...args.creation,
       ...(args.libSrc ? { libSrc: args.libSrc } : {}),
     },
   });
-  const configPath = Path.join(args.workingDirectory, `migrations.config.${args.configType!}`);
+  const configPath = Path.join(args.workingDirectory, `migrations.config.js`);
   if (await fileExists(configPath)) {
     throw new Error(`Config file already exists at ${configPath}`);
   }
-  if (args.configType === 'ts') {
-    await FS.writeFile(configPath, `import type { Config } from '${args.libSrc || DefaultConfig.creation!.libSrc!}';
+  await FS.writeFile(configPath, `module.exports = ${JSON.stringify(startingConfig, null, 2)};`);
 
-const config: Config = ${JSON.stringify(startingConfig, null, 2)};
-
-export default config;
-`);
-  } else if (args.configType === 'js') {
-    await FS.writeFile(configPath, `module.exports = ${JSON.stringify(startingConfig, null, 2)};
-`);
-  } else {
-    throw new Error(`not implemented`);
-  }
   if (!args.silent) {
     console.log(`Created ${configPath}`);
   }

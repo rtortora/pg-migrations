@@ -9,24 +9,7 @@ jest.mock("fs");
 const { workingDirectory } = useMockFs();
 
 describe('init command', ()=>{
-  test('can make a ts project', async ()=>{
-    await init({
-      workingDirectory,
-      configType: 'ts',
-      silent: true,
-      libSrc: '../src/',
-      pg: DummyPgConfig,
-    });
-    await FS.access(Path.join(workingDirectory, "migrations.config.ts"));
-    await FS.access(Path.join(workingDirectory, "migrations"));
-    await FS.access(Path.join(workingDirectory, "migrations/_template.ts"));
-
-    const loaded = await loadConfig(workingDirectory);
-    expect(loaded).not.toBeNull();
-    expect(loaded.creation.defaultMigrationType).toBe('ts');
-  });
-
-  test('can make a js project', async ()=>{
+  test('can make a new project', async ()=>{
     await init({
       workingDirectory,
       configType: 'js',
@@ -41,13 +24,5 @@ describe('init command', ()=>{
     const loaded = await loadConfig(workingDirectory);
     expect(loaded).not.toBeNull();
     expect(loaded.creation.defaultMigrationType).toBe('js');
-  });
-
-  test('cannot make a sql project', async ()=>{
-    await expect(init({
-      workingDirectory,
-      configType: 'sql',
-      silent: true,
-    })).rejects.toThrowError("Not implemented config type 'sql'");
   });
 });

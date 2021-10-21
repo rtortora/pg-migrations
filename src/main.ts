@@ -9,6 +9,7 @@ import { tidy } from './commands/tidy';
 import { help } from './commands/help';
 import { MigrationType } from './lib/local_migrations_map';
 import { RunDirection } from './lib/run_local_migration';
+import { importCode } from './lib/code_importer';
 
 interface IMainArgs {
   command?: string,
@@ -43,6 +44,8 @@ async function main() {
       workingDirectory: rootPath,
       ...initArgs,
     });
+  } else if (command === "test") {
+    console.log(await importCode("/Users/rtortora/dmb/api/migrations.config.ts"));
   } else {
     const context = await loadContext(rootPath);
 

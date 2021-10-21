@@ -10,7 +10,7 @@ jest.mock("fs");
 const { workingDirectory } = useMockFs();
 
 describe('create command', ()=>{
-  for (const migrationType of ['ts', 'js'] as MigrationType[]) {
+  for (const migrationType of ['js'] as MigrationType[]) {
     test(`can create a migration with ${migrationType} default`, async()=>{
       const { context } = await getStandardSetup({ workingDirectory, configType: migrationType });
       const key = generateNewMigrationKey(context);

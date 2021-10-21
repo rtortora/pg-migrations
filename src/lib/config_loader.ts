@@ -9,10 +9,7 @@ export type FullConfig = Required<Config> & {
   creation: Required<Config['creation']>
 };
 
-const ConfigFileNames: string[] = [
-  "migrations.config.ts",
-  "migrations.config.js",
-];
+const ConfigFileName = "migrations.config.js";
 
 export const DefaultConfig: Partial<Config> = {
   migrationsRelPath: "./migrations",
@@ -54,12 +51,10 @@ export function validateConfig(obj: any): obj is FullConfig {
 }
 
 export async function loadConfig(workingDirectory: string): Promise<FullConfig> {
-  for (const fileName of ConfigFileNames) {
-    if (await fileExists(Path.join(workingDirectory, fileName))) {
-      return await loadConfigFromPath(Path.join(workingDirectory, fileName));
-    }
+  if (await fileExists(Path.join(workingDirectory, ConfigFileName))) {
+    return await loadConfigFromPath(Path.join(workingDirectory, ConfigFileName));
   }
-  throw new ConfigValidationError(`Could not find migrations.config.ts/.js file at ${Path.join(workingDirectory, ConfigFileNames[0])}`);
+  throw new ConfigValidationError(`Could not find ${Path.join(workingDirectory, ConfigFileName)}`);
 }
 
 async function loadConfigFromPath(path: string): Promise<FullConfig> {

@@ -14,7 +14,7 @@ jest.mock("fs");
 const { workingDirectory } = useMockFs();
 
 describe('up command', ()=>{
-  for (const migrationType of ['ts', 'js'] as MigrationType[]) {
+  for (const migrationType of ['js'] as MigrationType[]) {
     test(`can status on a ${migrationType} project`, async()=>{
       const configType = migrationType === 'sql' ? 'ts' : migrationType;
       const { context } = await getStandardSetup({ workingDirectory, configType });
